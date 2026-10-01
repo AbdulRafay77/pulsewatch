@@ -1,26 +1,7 @@
-import { useEffect, useState } from "react";
-import api from "../lib/axios";
+import useApiHealth from "../hooks/useApiHealth";
 
 function ApiStatus() {
-  const [status, setStatus] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    async function checkApi() {
-      try {
-        const response = await api.get("/health");
-
-        setStatus(response.data.status);
-      } catch (error) {
-        setError("Unable to connect to PulseWatch API");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    checkApi();
-  }, []);
+  const { status, loading, error } = useApiHealth;
 
   if (loading) {
     return <h1>Checking API...</h1>;
