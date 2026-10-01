@@ -1,12 +1,7 @@
-import ApiStatus from "./components/ApiStatus";
+import AppRouter from "./app/router/AppRouter";
 
 function App() {
-  return (
-    <div>
-      <h1>PulseWatch</h1>
-      <ApiStatus />
-    </div>
-  );
+  return <AppRouter />;
 }
 
 export default App;
