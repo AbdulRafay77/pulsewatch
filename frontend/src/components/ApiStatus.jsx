@@ -1,7 +1,7 @@
-import useApiHealth from "../hooks/useApiHealth";
+import useApiHealth from "../hooks/useApiHealth.js";
 
 function ApiStatus() {
-  const { status, loading, error } = useApiHealth;
+  const { status, loading, error } = useApiHealth();
 
   if (loading) {
     return <h1>Checking API...</h1>;
