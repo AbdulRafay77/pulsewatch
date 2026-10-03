@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getMonitors, createMonitor } from "../api/monitorApi.js";
 
-function useMonitor() {
+function useMonitors() {
   const [monitors, setMonitors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
