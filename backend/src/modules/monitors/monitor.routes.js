@@ -1,5 +1,5 @@
 const express = require("express");
-const monitorController = require("./moditor.controller.js");
+const monitorController = require("./monitor.controller.js");
 
 const router = express.Router();
 
