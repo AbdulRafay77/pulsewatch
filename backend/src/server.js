@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db.js");
+const monitorRoutes = require("./modules/monitors/monitor.routes.js");
 
 dotenv.config();
 
@@ -16,6 +17,8 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use("/api/monitors", monitorRoutes);
 
 app.get("/api/health", (req, res) => {
   res.json({
