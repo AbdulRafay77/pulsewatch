@@ -6,7 +6,7 @@ export async function getMonitors() {
   return response.data;
 }
 
-export async function createMonitor() {
+export async function createMonitor(monitorData) {
   const response = await api.post("/monitors", monitorData);
 
   return response.data;
