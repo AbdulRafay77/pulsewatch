@@ -16,7 +16,7 @@ async function getMonitors(req, res) {
   try {
     const monitors = await monitorService.getMonitors();
 
-    res.json(monitors);
+    res.status(200).json(monitors);
   } catch (error) {
     res.status(500).json({
       message: "Failed to fetch monitors"
