@@ -34,7 +34,7 @@ async function runDueChecks() {
     for (const monitor of dueMonitors) {
       try {
         console.log(
-          `Checking monitor: ${monitor.name}`
+          `[${new Date().toLocaleTimeString()}] Checking monitor: ${monitor.name}`
         );
 
         await checkService.runMonitorCheck(
