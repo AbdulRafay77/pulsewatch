@@ -1,12 +1,14 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+
 const connectDB = require("./config/db.js");
 const monitorRoutes = require("./modules/monitors/monitor.routes.js");
+const {
+  startMonitorScheduler
+} = require("./services/monitorScheduler.js");
 
 dotenv.config();
-
-connectDB();
 
 const app = express();
 
@@ -29,6 +31,23 @@ app.get("/api/health", (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+async function startServer() {
+  try {
+    await connectDB();
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+
+      startMonitorScheduler();
+    });
+  } catch (error) {
+    console.error(
+      "Failed to start server:",
+      error.message
+    );
+
+    process.exit(1);
+  }
+}
+
+startServer();
