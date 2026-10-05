@@ -7,7 +7,8 @@ function MonitorsPage() {
     monitors,
     loading,
     error,
-    addMonitor
+    addMonitor,
+    checkMonitorNow
   } = useMonitors();
 
   if (loading) {
@@ -30,6 +31,7 @@ function MonitorsPage() {
             <MonitorCard
               key={monitor._id}
               monitor={monitor}
+              onCheck={checkMonitorNow}
             />
           ))}
         </div>

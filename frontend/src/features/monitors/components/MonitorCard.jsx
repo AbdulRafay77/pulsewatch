@@ -1,4 +1,20 @@
-function MonitorCard({ monitor }) {
+import { useState } from "react";
+
+function MonitorCard({ monitor, onCheck }) {
+  const [checking, setChecking] = useState(false);
+
+  async function handleCheck() {
+    try {
+      setChecking(true);
+
+      await onCheck(monitor._id);
+    } catch (error) {
+      // useMonitors already handles the visible error
+    } finally {
+      setChecking(false);
+    }
+  }
+
   return (
     <div>
       <h2>{monitor.name}</h2>
@@ -18,6 +34,20 @@ function MonitorCard({ monitor }) {
       <p>
         {monitor.isPaused ? "Paused" : "Active"}
       </p>
+
+      <p>
+        Last checked:{" "}
+        {monitor.lastCheckedAt
+          ? new Date(monitor.lastCheckedAt).toLocaleString()
+          : "Never"}
+      </p>
+
+      <button
+        onClick={handleCheck}
+        disabled={checking || monitor.isPaused}
+      >
+        {checking ? "Checking..." : "Check Now"}
+      </button>
     </div>
   );
 }
