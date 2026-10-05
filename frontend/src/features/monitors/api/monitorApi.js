@@ -11,3 +11,11 @@ export async function createMonitor(monitorData) {
 
   return response.data;
 }
+
+export async function runMonitorCheck(monitorId) {
+  const response = await api.post(
+    `/monitors/${monitorId}/check`
+  );
+
+  return response.data;
+}
