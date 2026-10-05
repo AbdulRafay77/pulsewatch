@@ -1,6 +1,7 @@
 const Monitor = require("../monitors/monitor.model");
 const Check = require("./check.model");
 const checkMonitor = require("../../services/checkMonitor");
+const incidentService = require("../incidents/incident.service.js");
 
 async function runMonitorCheck(monitorId) {
   const monitor = await Monitor.findById(monitorId);
@@ -17,6 +18,8 @@ async function runMonitorCheck(monitorId) {
     throw error;
   }
 
+  const previousStatus = monitor.status;
+
   const result = await checkMonitor(monitor);
 
   const checkedAt = new Date();
@@ -30,7 +33,30 @@ async function runMonitorCheck(monitorId) {
     checkedAt
   });
 
-  monitor.status = result.success ? "up" : "down";
+  const newStatus = result.success ? "up" : "down";
+
+  if (
+    newStatus === "down" &&
+    previousStatus !== "down"
+  ) {
+    await incidentService.createIncident(
+      monitor,
+      result,
+      checkedAt
+    );
+  }
+
+  if (
+    newStatus === "up" &&
+    previousStatus === "down"
+  ) {
+    await incidentService.resolveIncident(
+      monitor._id,
+      checkedAt
+    );
+  }
+
+  monitor.status = newStatus;
   monitor.lastCheckedAt = checkedAt;
 
   await monitor.save();
