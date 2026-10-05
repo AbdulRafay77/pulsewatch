@@ -1,6 +1,13 @@
 const dns = require("dns").promises;
 const net = require("net");
 
+class UnsafeTargetError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "UnsafeTargetError";
+  }
+}
+
 function isPrivateIPv4(ip) {
   const parts = ip.split(".").map(Number);
 
@@ -40,14 +47,18 @@ async function validateTargetUrl(targetUrl) {
     parsedUrl.protocol !== "http:" &&
     parsedUrl.protocol !== "https:"
   ) {
-    throw new Error("Only HTTP and HTTPS URLs are allowed");
+    throw new UnsafeTargetError(
+      "Only HTTP and HTTPS URLs are allowed"
+    );
   }
 
   if (
     parsedUrl.hostname === "localhost" ||
     parsedUrl.hostname === "::1"
   ) {
-    throw new Error("Local addresses are not allowed");
+    throw new UnsafeTargetError(
+      "Local addresses are not allowed"
+    );
   }
 
   const addresses = await dns.lookup(parsedUrl.hostname, {
@@ -59,7 +70,9 @@ async function validateTargetUrl(targetUrl) {
       net.isIPv4(address.address) &&
       isPrivateIPv4(address.address)
     ) {
-      throw new Error("Private network addresses are not allowed");
+      throw new UnsafeTargetError(
+        "Private network addresses are not allowed"
+      );
     }
 
     if (
@@ -69,16 +82,14 @@ async function validateTargetUrl(targetUrl) {
         address.address.startsWith("fe80:")
       )
     ) {
-      throw new Error("Private network addresses are not allowed");
+      throw new UnsafeTargetError(
+        "Private network addresses are not allowed"
+      );
     }
   }
-
-  return parsedUrl;
 }
 
 async function checkMonitor(monitor) {
-  await validateTargetUrl(monitor.url);
-
   const controller = new AbortController();
 
   const timeout = setTimeout(() => {
@@ -88,6 +99,8 @@ async function checkMonitor(monitor) {
   const startedAt = Date.now();
 
   try {
+    await validateTargetUrl(monitor.url);
+
     const response = await fetch(monitor.url, {
       method: "GET",
       signal: controller.signal,
@@ -103,6 +116,10 @@ async function checkMonitor(monitor) {
       errorMessage: null
     };
   } catch (error) {
+    if (error.name === "UnsafeTargetError") {
+      throw error;
+    }
+
     const responseTime = Date.now() - startedAt;
 
     return {
