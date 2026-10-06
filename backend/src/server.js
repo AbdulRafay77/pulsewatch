@@ -7,6 +7,7 @@ const monitorRoutes = require("./modules/monitors/monitor.routes.js");
 const {
   startMonitorScheduler
 } = require("./services/monitorScheduler.js");
+const incidentRoutes = require("./modules/incidents/incident.routes.js");
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(
 app.use(express.json());
 
 app.use("/api/monitors", monitorRoutes);
+app.use("/api/incidents", incidentRoutes);
 
 app.get("/api/health", (req, res) => {
   res.json({
