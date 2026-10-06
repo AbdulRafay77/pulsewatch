@@ -24,7 +24,7 @@ async function createIncident(monitor, result, checkedAt) {
         }
       },
       {
-        new: true,
+        returnDocument: "after",
         upsert: true
       }
     );
