@@ -46,7 +46,14 @@ async function resolveIncident(monitorId, checkedAt) {
   return incident;
 }
 
+async function getIncidents() {
+  return Incident.find()
+    .populate("monitorId", "name url status")
+    .sort({ startedAt: -1 });
+}
+
 module.exports = {
   createIncident,
-  resolveIncident
+  resolveIncident,
+  getIncidents
 };
