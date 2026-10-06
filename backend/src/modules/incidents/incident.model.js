@@ -39,4 +39,14 @@ const incidentSchema = new mongoose.Schema(
   }
 );
 
+incidentSchema.index(
+  { monitorId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      status: "active"
+    }
+  }
+);
+
 module.exports = mongoose.model("Incident", incidentSchema);

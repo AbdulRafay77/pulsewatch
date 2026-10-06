@@ -1,15 +1,6 @@
 const Incident = require("./incident.model");
 
 async function createIncident(monitor, result, checkedAt) {
-  const existingIncident = await Incident.findOne({
-    monitorId: monitor._id,
-    status: "active"
-  });
-
-  if (existingIncident) {
-    return existingIncident;
-  }
-
   let reason = "Monitor check failed";
 
   if (result.statusCode) {
@@ -18,12 +9,35 @@ async function createIncident(monitor, result, checkedAt) {
     reason = result.errorMessage;
   }
 
-  return Incident.create({
-    monitorId: monitor._id,
-    status: "active",
-    startedAt: checkedAt,
-    reason
-  });
+  try {
+    return await Incident.findOneAndUpdate(
+      {
+        monitorId: monitor._id,
+        status: "active"
+      },
+      {
+        $setOnInsert: {
+          monitorId: monitor._id,
+          status: "active",
+          startedAt: checkedAt,
+          reason
+        }
+      },
+      {
+        new: true,
+        upsert: true
+      }
+    );
+  } catch (error) {
+    if (error.code === 11000) {
+      return Incident.findOne({
+        monitorId: monitor._id,
+        status: "active"
+      });
+    }
+
+    throw error;
+  }
 }
 
 async function resolveIncident(monitorId, checkedAt) {
