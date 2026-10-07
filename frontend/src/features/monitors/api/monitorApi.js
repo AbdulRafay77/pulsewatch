@@ -19,3 +19,17 @@ export async function runMonitorCheck(monitorId) {
 
   return response.data;
 }
+
+export async function getMonitorById(monitorId) {
+  const response = await api.get(`/monitors/${monitorId}`);
+
+  return response.data;
+}
+
+export async function getMonitorChecks(monitorId) {
+  const response = await api.get(
+    `/monitors/${monitorId}/checks`
+  );
+
+  return response.data;
+}
