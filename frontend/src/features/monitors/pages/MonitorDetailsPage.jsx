@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import useMonitorDetails from "../hooks/useMonitorDetails.js";
+import MonitorStats from "../components/MonitorStats.jsx";
 
 function MonitorDetailsPage() {
   const { id } = useParams();
@@ -46,6 +47,8 @@ function MonitorDetailsPage() {
             ).toLocaleString()
           : "Never"}
       </p>
+
+      <MonitorStats checks={checks} />
 
       <h2>Recent Checks</h2>
 
