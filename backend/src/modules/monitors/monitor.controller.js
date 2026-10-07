@@ -24,7 +24,26 @@ async function getMonitors(req, res) {
   }
 }
 
+async function getMonitorById(req, res) {
+  try {
+    const monitor = await monitorService.getMonitorById(
+      req.params.id
+    );
+
+    res.status(200).json(monitor);
+  } catch (error) {
+    console.error("Get monitor error:", error);
+
+    res.status(error.statusCode || 500).json({
+      message: error.statusCode
+        ? error.message
+        : "Failed to fetch monitor"
+    });
+  }
+}
+
 module.exports = {
   createMonitor,
-  getMonitors
+  getMonitors,
+  getMonitorById
 };
