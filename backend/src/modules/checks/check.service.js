@@ -67,6 +67,15 @@ async function runMonitorCheck(monitorId) {
   };
 }
 
+async function getChecksByMonitor(monitorId) {
+  return Check.find({
+    monitorId
+  })
+    .sort({ checkedAt: -1 })
+    .limit(50);
+}
+
 module.exports = {
-  runMonitorCheck
+  runMonitorCheck,
+  getChecksByMonitor
 };

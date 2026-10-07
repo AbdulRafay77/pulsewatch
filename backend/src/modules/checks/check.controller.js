@@ -21,6 +21,23 @@ async function runMonitorCheck(req, res) {
   }
 }
 
+async function getChecksByMonitor(req, res) {
+  try {
+    const checks = await checkService.getChecksByMonitor(
+      req.params.id
+    );
+
+    res.status(200).json(checks);
+  } catch (error) {
+    console.error("Get checks error:", error);
+
+    res.status(500).json({
+      message: "Failed to fetch check history"
+    });
+  }
+}
+
 module.exports = {
-  runMonitorCheck
+  runMonitorCheck,
+  getChecksByMonitor
 };
