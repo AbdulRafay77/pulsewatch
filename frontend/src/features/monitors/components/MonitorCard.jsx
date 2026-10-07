@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function MonitorCard({ monitor, onCheck }) {
   const [checking, setChecking] = useState(false);
@@ -48,6 +49,10 @@ function MonitorCard({ monitor, onCheck }) {
       >
         {checking ? "Checking..." : "Check Now"}
       </button>
+
+      <Link to={`/monitors/${monitor._id}`}>
+        View Details
+      </Link>
     </div>
   );
 }
