@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import useMonitorDetails from "../hooks/useMonitorDetails.js";
-import MonitorStats from "../components/MonitorStats.jsx";
+import MonitorStats from "../components/MonitorStats.jsx"
+import ResponseTimeChart
+  from "../components/ResponseTimeChart.jsx";
 
 function MonitorDetailsPage() {
   const { id } = useParams();
@@ -49,6 +51,8 @@ function MonitorDetailsPage() {
       </p>
 
       <MonitorStats checks={checks} />
+
+      <ResponseTimeChart checks={checks} />
 
       <h2>Recent Checks</h2>
 
