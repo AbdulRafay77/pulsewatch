@@ -9,5 +9,6 @@ router.get('/', monitorController.getMonitors);
 router.post("/:id/check", checkController.runMonitorCheck);
 router.get("/:id/checks", checkController.getChecksByMonitor);
 router.get("/:id", monitorController.getMonitorById);
+router.patch("/:id", monitorController.updateMonitor);
 
 module.exports = router;

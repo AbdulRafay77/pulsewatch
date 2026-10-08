@@ -20,8 +20,28 @@ async function getMonitorById(monitorId) {
   return monitor;
 }
 
+async function updateMonitor(monitorId, data) {
+  const monitor = await Monitor.findByIdAndUpdate(
+    monitorId,
+    updates,
+    { 
+      returnDocument: "after",
+      runValidators: true 
+    }
+  );
+
+  if (!monitor) {
+    const error = new Error("Monitor not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  return monitor;
+}
+
 module.exports = {
   createMonitor,
   getMonitors,
-  getMonitorById
+  getMonitorById,
+  updateMonitor
 };
