@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { getMonitors, createMonitor, runMonitorCheck, updateMonitor } from "../api/monitorApi.js";
+import {
+  getMonitors,
+  createMonitor,
+  runMonitorCheck,
+  updateMonitor,
+  deleteMonitor
+} from "../api/monitorApi.js";
 
 function useMonitors() {
   const [monitors, setMonitors] = useState([]);
@@ -111,6 +117,23 @@ function useMonitors() {
     }
   }
 
+  async function removeMonitor(monitorId) {
+    try {
+      setError("");
+
+      await deleteMonitor(monitorId);
+
+      setMonitors((currentMonitors) =>
+        currentMonitors.filter(
+          (monitor) => monitor._id !== monitorId
+        )
+      );
+    } catch (error) {
+      setError("Failed to delete monitor");
+      throw error;
+    }
+  }
+
   return {
     monitors,
     loading,
@@ -118,7 +141,8 @@ function useMonitors() {
     addMonitor,
     checkMonitorNow,
     toggleMonitorPause,
-    editMonitor
+    editMonitor,
+    removeMonitor
   };
 }
 

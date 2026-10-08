@@ -77,9 +77,31 @@ async function updateMonitor(req, res) {
   }
 }
 
+async function deleteMonitor(req, res) {
+  try {
+    const monitor = await monitorService.deleteMonitor(
+      req.params.id
+    );
+
+    res.status(200).json({
+      message: "Monitor deleted successfully",
+      monitorId: monitor._id
+    });
+  } catch (error) {
+    console.error("Delete monitor error:", error);
+
+    res.status(error.statusCode || 500).json({
+      message: error.statusCode
+        ? error.message
+        : "Failed to delete monitor"
+    });
+  }
+}
+
 module.exports = {
   createMonitor,
   getMonitors,
   getMonitorById,
-  updateMonitor
+  updateMonitor,
+  deleteMonitor
 };

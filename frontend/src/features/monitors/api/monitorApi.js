@@ -42,3 +42,11 @@ export async function updateMonitor(monitorId, updates) {
 
   return response.data;
 }
+
+export async function deleteMonitor(monitorId) {
+  const response = await api.delete(
+    `/monitors/${monitorId}`
+  );
+
+  return response.data;
+}

@@ -2,7 +2,13 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import EditMonitorForm from "./EditMonitorForm.jsx";
 
-function MonitorCard({ monitor, onCheck, onTogglePause, onEdit }) {
+function MonitorCard({
+  monitor,
+  onCheck,
+  onTogglePause,
+  onEdit,
+  onDelete
+}) {
   const [checking, setChecking] = useState(false);
   const [updatingPause, setUpdatingPause] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -31,6 +37,22 @@ function MonitorCard({ monitor, onCheck, onTogglePause, onEdit }) {
       // visible error handled by useMonitors
     } finally {
       setUpdatingPause(false);
+    }
+  }
+
+  async function handleDelete() {
+    const confirmed = window.confirm(
+      `Delete "${monitor.name}"? This will also delete its check and incident history.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await onDelete(monitor._id);
+    } catch (error) {
+      // visible error handled by useMonitors
     }
   }
 
@@ -81,6 +103,10 @@ function MonitorCard({ monitor, onCheck, onTogglePause, onEdit }) {
 
       <button onClick={() => setEditing(true)}>
         Edit
+      </button>
+
+      <button onClick={handleDelete}>
+        Delete
       </button>
 
       <Link to={`/monitors/${monitor._id}`}>
