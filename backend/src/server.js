@@ -9,6 +9,9 @@ const {
 } = require("./services/monitorScheduler.js");
 const incidentRoutes = require("./modules/incidents/incident.routes.js");
 
+const authRoutes =
+  require("./modules/auth/auth.routes.js");
+
 dotenv.config();
 
 const app = express();
@@ -20,6 +23,8 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use("/api/auth", authRoutes);
 
 app.use("/api/monitors", monitorRoutes);
 app.use("/api/incidents", incidentRoutes);
