@@ -1,5 +1,7 @@
 import useDashboard from "../hooks/useDashboard.js";
 import StatCard from "../components/StatCard.jsx";
+import MonitorOverview from "../components/MonitorOverview.jsx";
+import ActiveIncidents from "../components/ActiveIncidents.jsx";
 
 function Dashboard() {
   const {
@@ -108,6 +110,10 @@ function Dashboard() {
           value={`${healthPercentage}%`}
         />
       </div>
+
+      <MonitorOverview monitors={monitors.slice(0, 5)} />
+
+      <ActiveIncidents incidents={incidents} />
     </div>
   );
 }
