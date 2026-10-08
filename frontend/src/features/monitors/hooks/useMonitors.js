@@ -87,13 +87,38 @@ function useMonitors() {
     }
   }
 
+  async function editMonitor(monitorId, updates) {
+    try {
+      setError("");
+
+      const updatedMonitor = await updateMonitor(
+        monitorId,
+        updates
+      );
+
+      setMonitors((currentMonitors) =>
+        currentMonitors.map((monitor) =>
+          monitor._id === monitorId
+            ? updatedMonitor
+            : monitor
+        )
+      );
+
+      return updatedMonitor;
+    } catch (error) {
+      setError("Failed to edit monitor");
+      throw error;
+    }
+  }
+
   return {
     monitors,
     loading,
     error,
     addMonitor,
     checkMonitorNow,
-    toggleMonitorPause
+    toggleMonitorPause,
+    editMonitor
   };
 }
 

@@ -44,9 +44,25 @@ async function getMonitorById(req, res) {
 
 async function updateMonitor(req, res) {
   try {
+    const allowedFields = [
+      "name",
+      "url",
+      "intervalMinutes",
+      "timeoutMs",
+      "isPaused"
+    ];
+
+    const updates = {};
+
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
+      }
+    }
+
     const monitor = await monitorService.updateMonitor(
       req.params.id,
-      req.body
+      updates
     );
 
     res.status(200).json(monitor);

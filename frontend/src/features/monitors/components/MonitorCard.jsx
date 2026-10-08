@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import EditMonitorForm from "./EditMonitorForm.jsx";
 
-function MonitorCard({ monitor, onCheck, onTogglePause }) {
+function MonitorCard({ monitor, onCheck, onTogglePause, onEdit }) {
   const [checking, setChecking] = useState(false);
   const [updatingPause, setUpdatingPause] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   async function handleCheck() {
     try {
@@ -77,9 +79,24 @@ function MonitorCard({ monitor, onCheck, onTogglePause }) {
             : "Pause"}
       </button>
 
+      <button onClick={() => setEditing(true)}>
+        Edit
+      </button>
+
       <Link to={`/monitors/${monitor._id}`}>
         View Details
       </Link>
+
+      {editing && (
+        <EditMonitorForm
+          monitor={monitor}
+          onSave={async (monitorId, updates) => {
+            await onEdit(monitorId, updates);
+            setEditing(false);
+          }}
+          onCancel={() => setEditing(false)}
+        />
+      )}
     </div>
   );
 }
