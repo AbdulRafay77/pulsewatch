@@ -33,3 +33,12 @@ export async function getMonitorChecks(monitorId) {
 
   return response.data;
 }
+
+export async function updateMonitor(monitorId, updates) {
+  const response = await api.patch(
+    `/monitors/${monitorId}`,
+    updates
+  );
+
+  return response.data;
+}

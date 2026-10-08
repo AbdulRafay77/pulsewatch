@@ -8,7 +8,8 @@ function MonitorsPage() {
     loading,
     error,
     addMonitor,
-    checkMonitorNow
+    checkMonitorNow,
+    toggleMonitorPause
   } = useMonitors();
 
   if (loading) {
@@ -32,6 +33,7 @@ function MonitorsPage() {
               key={monitor._id}
               monitor={monitor}
               onCheck={checkMonitorNow}
+              onTogglePause={toggleMonitorPause}
             />
           ))}
         </div>

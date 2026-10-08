@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMonitors, createMonitor, runMonitorCheck } from "../api/monitorApi.js";
+import { getMonitors, createMonitor, runMonitorCheck, updateMonitor } from "../api/monitorApi.js";
 
 function useMonitors() {
   const [monitors, setMonitors] = useState([]);
@@ -61,12 +61,39 @@ function useMonitors() {
     }
   }
 
+  async function toggleMonitorPause(monitorId, isPaused) {
+    try {
+      setError("");
+
+      const updatedMonitor = await updateMonitor(
+        monitorId,
+        {
+          isPaused: !isPaused
+        }
+      );
+
+      setMonitors((currentMonitors) =>
+        currentMonitors.map((monitor) =>
+          monitor._id === monitorId
+            ? updatedMonitor
+            : monitor
+        )
+      );
+
+      return updatedMonitor;
+    } catch (error) {
+      setError("Failed to update monitor");
+      throw error;
+    }
+  }
+
   return {
     monitors,
     loading,
     error,
     addMonitor,
-    checkMonitorNow
+    checkMonitorNow,
+    toggleMonitorPause
   };
 }
 

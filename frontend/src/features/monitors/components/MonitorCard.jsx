@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-function MonitorCard({ monitor, onCheck }) {
+function MonitorCard({ monitor, onCheck, onTogglePause }) {
   const [checking, setChecking] = useState(false);
+  const [updatingPause, setUpdatingPause] = useState(false);
 
   async function handleCheck() {
     try {
@@ -13,6 +14,21 @@ function MonitorCard({ monitor, onCheck }) {
       // useMonitors already handles the visible error
     } finally {
       setChecking(false);
+    }
+  }
+
+  async function handleTogglePause() {
+    try {
+      setUpdatingPause(true);
+
+      await onTogglePause(
+        monitor._id,
+        monitor.isPaused
+      );
+    } catch (error) {
+      // visible error handled by useMonitors
+    } finally {
+      setUpdatingPause(false);
     }
   }
 
@@ -48,6 +64,17 @@ function MonitorCard({ monitor, onCheck }) {
         disabled={checking || monitor.isPaused}
       >
         {checking ? "Checking..." : "Check Now"}
+      </button>
+
+      <button 
+        onClick={handleTogglePause}
+        disabled={updatingPause}
+      >
+        {updatingPause
+          ? "Updating..."
+          : monitor.isPaused
+            ? "Resume"
+            : "Pause"}
       </button>
 
       <Link to={`/monitors/${monitor._id}`}>
