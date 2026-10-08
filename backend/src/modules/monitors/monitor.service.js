@@ -20,13 +20,13 @@ async function getMonitorById(monitorId) {
   return monitor;
 }
 
-async function updateMonitor(monitorId, data) {
+async function updateMonitor(monitorId, updates) {
   const monitor = await Monitor.findByIdAndUpdate(
     monitorId,
     updates,
-    { 
+    {
       returnDocument: "after",
-      runValidators: true 
+      runValidators: true
     }
   );
 
