@@ -1,4 +1,5 @@
 const Incident = require("./incident.model");
+const Monitor = require("../monitors/monitor.model.js");
 
 async function createIncident(monitor, result, checkedAt) {
   let reason = "Monitor check failed";
@@ -60,8 +61,20 @@ async function resolveIncident(monitorId, checkedAt) {
   return incident;
 }
 
-async function getIncidents() {
-  return Incident.find()
+async function getIncidents(userId) {
+  const monitors = await Monitor.find({
+    userId
+  }).select("_id");
+
+  const monitorIds = monitors.map(
+    (monitor) => monitor._id
+  );
+
+  return Incident.find({
+    monitorId: {
+      $in: monitorIds
+    }
+  })
     .populate("monitorId", "name url status")
     .sort({ startedAt: -1 });
 }

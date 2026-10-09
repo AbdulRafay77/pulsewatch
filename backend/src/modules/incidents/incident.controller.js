@@ -2,7 +2,9 @@ const incidentService = require("./incident.service");
 
 async function getIncidents(req, res) {
   try {
-    const incidents = await incidentService.getIncidents();
+    const incidents = await incidentService.getIncidents(
+      req.user._id
+    );
 
     res.status(200).json(incidents);
   } catch (error) {
