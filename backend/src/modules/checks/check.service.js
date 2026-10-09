@@ -67,7 +67,18 @@ async function runMonitorCheck(monitorId) {
   };
 }
 
-async function getChecksByMonitor(monitorId) {
+async function getChecksByMonitor(userId, monitorId) {
+  const monitor = await Monitor.findOne({
+    _id: monitorId,
+    userId
+  });
+
+  if (!monitor) {
+    const error = new Error("Monitor not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
   return Check.find({
     monitorId
   })
@@ -75,7 +86,23 @@ async function getChecksByMonitor(monitorId) {
     .limit(50);
 }
 
+async function runUserMonitorCheck(userId, monitorId) {
+  const monitor = await Monitor.findOne({
+    _id: monitorId,
+    userId
+  });
+
+  if (!monitor) {
+    const error = new Error("Monitor not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  return runMonitorCheck(monitorId);
+}
+
 module.exports = {
   runMonitorCheck,
-  getChecksByMonitor
+  getChecksByMonitor,
+  runUserMonitorCheck
 };

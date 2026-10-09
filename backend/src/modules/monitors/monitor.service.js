@@ -2,16 +2,29 @@ const Monitor = require("./monitor.model");
 const Check = require("../checks/check.model.js");
 const Incident = require("../incidents/incident.model.js");
 
-async function createMonitor(data) {
-  return Monitor.create(data);
+async function createMonitor(userId, data) {
+  console.log("SERVICE userId:", userId);
+  console.log("SERVICE data:", data);
+
+  return Monitor.create({
+    ...data,
+    userId
+  });
 }
 
-async function getMonitors() {
-  return Monitor.find().sort({ createdAt: -1 });
+async function getMonitors(userId) {
+  return Monitor.find({
+    userId
+  }).sort({ 
+    createdAt: -1
+   });
 }
 
-async function getMonitorById(monitorId) {
-  const monitor = await Monitor.findById(monitorId);
+async function getMonitorById(userId, monitorId) {
+  const monitor = await Monitor.fineOne({
+    _id: monitorId,
+    userId
+  });
 
   if (!monitor) {
     const error = new Error("Monitor not found");
@@ -22,9 +35,12 @@ async function getMonitorById(monitorId) {
   return monitor;
 }
 
-async function updateMonitor(monitorId, updates) {
-  const monitor = await Monitor.findByIdAndUpdate(
-    monitorId,
+async function updateMonitor(userId, monitorId, updates) {
+  const monitor = await Monitor.findOneAndUpdate(
+    {
+      _id: monitorId,
+      userId
+    },
     updates,
     {
       returnDocument: "after",
@@ -41,8 +57,11 @@ async function updateMonitor(monitorId, updates) {
   return monitor;
 }
 
-async function deleteMonitor(monitorId) {
-  const monitor = await Monitor.findById(monitorId);
+async function deleteMonitor(userId, monitorId) {
+  const monitor = await Monitor.findOne({
+    _id: monitorId,
+    userId
+  });
 
   if (!monitor) {
     const error = new Error("Monitor not found");
@@ -58,7 +77,10 @@ async function deleteMonitor(monitorId) {
     monitorId: monitor._id
   });
 
-  await Monitor.findByIdAndDelete(monitor._id);
+  await Monitor.deleteOne({
+    _id: monitor._id,
+    userId
+  });
 
   return monitor;
 }

@@ -1,8 +1,13 @@
 const express = require("express");
 const monitorController = require("./monitor.controller.js");
 const checkController = require("../checks/check.controller.js");
+const {
+  requireAuth
+} = require("../../middleware/auth.middleware.js");
 
 const router = express.Router();
+
+router.use(requireAuth);
 
 router.post('/', monitorController.createMonitor);
 router.get('/', monitorController.getMonitors);

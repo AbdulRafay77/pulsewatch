@@ -2,10 +2,18 @@ const monitorService = require("./monitor.service.js");
 
 async function createMonitor(req, res) {
   try {
-    const monitor = await monitorService.createMonitor(req.body);
+    console.log("CONTROLLER userId:", req.user._id);
+    console.log("CONTROLLER body:", req.body);
+
+    const monitor = await monitorService.createMonitor(
+      req.user._id,
+      req.body
+    );
 
     res.status(201).json(monitor);
   } catch (error) {
+    console.error("Create monitor error:", error);
+
     res.status(500).json({
       message: "Failed to create monitor"
     });
@@ -14,10 +22,16 @@ async function createMonitor(req, res) {
 
 async function getMonitors(req, res) {
   try {
-    const monitors = await monitorService.getMonitors();
+    console.log("Logged-in user ID:", req.user._id);
+
+    const monitors = await monitorService.getMonitors(
+      req.user._id
+    );
 
     res.status(200).json(monitors);
   } catch (error) {
+    console.error("Get monitors error:", error);
+
     res.status(500).json({
       message: "Failed to fetch monitors"
     });
@@ -27,6 +41,7 @@ async function getMonitors(req, res) {
 async function getMonitorById(req, res) {
   try {
     const monitor = await monitorService.getMonitorById(
+      req.user._id,
       req.params.id
     );
 
@@ -61,6 +76,7 @@ async function updateMonitor(req, res) {
     }
 
     const monitor = await monitorService.updateMonitor(
+      req.user._id,
       req.params.id,
       updates
     );
@@ -80,6 +96,7 @@ async function updateMonitor(req, res) {
 async function deleteMonitor(req, res) {
   try {
     const monitor = await monitorService.deleteMonitor(
+      req.user._id,
       req.params.id
     );
 
