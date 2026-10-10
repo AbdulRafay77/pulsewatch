@@ -5,6 +5,12 @@ import {
   Navigate
 } from "react-router-dom";
 
+import LoginPage
+  from "../../features/auth/pages/LoginPage.jsx";
+
+import ProtectedRoute
+  from "../../features/auth/components/ProtectedRoute.jsx";
+
 import Dashboard from "../../features/dashboard/pages/Dashboard";
 import MonitorsPage from "../../features/monitors/pages/MonitorsPage";
 import IncidentsPage from "../../features/incidents/pages/IncidentsPage";
@@ -20,12 +26,40 @@ function AppRouter() {
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/login" element={<h1>Login</h1>} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<h1>Signup</h1>} />
-        <Route path="/monitors" element={<MonitorsPage />} />
-        <Route path="/monitors/:id" element={<MonitorDetailsPage />} />
-        <Route path="/incidents" element={<IncidentsPage />} />
+        <Route 
+          path="/monitors" 
+          element={
+            <ProtectedRoute>
+              <MonitorsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="/monitors/:id" 
+          element={
+            <ProtectedRoute>
+              <MonitorDetailsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/incidents" 
+          element={
+            <ProtectedRoute>
+              <IncidentsPage />
+            </ProtectedRoute>
+          } 
+        />
       </Routes>
     </BrowserRouter>
   );
