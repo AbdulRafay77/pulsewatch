@@ -13,7 +13,8 @@ import {
 } from "../api/authApi.js";
 
 import {
-  setAccessToken
+  setAccessToken,
+  setAuthFailureHandler
 } from "../../../lib/axios.js";
 
 const AuthContext = createContext(null);
@@ -44,6 +45,16 @@ export function AuthProvider({ children }) {
     }
 
     restoreSession();
+  }, []);
+
+  useEffect(() => {
+    setAuthFailureHandler(() => {
+      setUser(null);
+    });
+
+    return () => {
+      setAuthFailureHandler(null);
+    };
   }, []);
 
   async function signup(username, email, password) {
