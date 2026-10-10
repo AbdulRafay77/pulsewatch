@@ -1,35 +1,98 @@
 const authService = require("./auth.service.js");
+
 const {
   createAccessToken
 } = require("./token.service.js");
 
+const refreshSessionService =
+  require("../../features/auth/refreshSession.service.js");
+
+function setRefreshCookie(res, refreshToken) {
+  const days =
+    Number(
+      process.env.REFRESH_TOKEN_EXPIRES_DAYS
+    ) || 7;
+
+  res.cookie(
+    "refreshToken",
+    refreshToken,
+    {
+      httpOnly: true,
+
+      secure:
+        process.env.NODE_ENV === "production",
+
+      sameSite: "lax",
+
+      path: "/api/auth",
+
+      maxAge:
+        days *
+        24 *
+        60 *
+        60 *
+        1000
+    }
+  );
+}
+
 async function signup(req, res) {
   try {
-    const user = await authService.signup(req.body);
+    const user =
+      await authService.signup(req.body);
 
-    const accessToken = createAccessToken(user);
+    const accessToken =
+      createAccessToken(user);
+
+    const refreshToken =
+      await refreshSessionService.createSession(
+        user._id
+      );
+
+    setRefreshCookie(
+      res,
+      refreshToken
+    );
 
     res.status(201).json({
-      message: "Account created successfully",
+      message:
+        "Account created successfully",
       user,
       accessToken
     });
   } catch (error) {
-    console.error("Signup error:", error);
+    console.error(
+      "Signup error:",
+      error
+    );
 
-    res.status(error.statusCode || 500).json({
-      message: error.statusCode
-        ? error.message
-        : "Failed to create account"
-    });
+    res
+      .status(error.statusCode || 500)
+      .json({
+        message: error.statusCode
+          ? error.message
+          : "Failed to create account"
+      });
   }
 }
 
 async function login(req, res) {
   try {
-    const user = await authService.login(req.body);
+    const user =
+      await authService.login(req.body);
 
-    const accessToken = createAccessToken(user);
+    const accessToken =
+      createAccessToken(user);
+
+    const refreshToken =
+      await refreshSessionService.createSession(
+        user._id
+      );
+
+    setRefreshCookie(
+      res,
+      refreshToken
+    );
 
     res.status(200).json({
       message: "Login successful",
@@ -37,13 +100,18 @@ async function login(req, res) {
       accessToken
     });
   } catch (error) {
-    console.error("Login error:", error);
+    console.error(
+      "Login error:",
+      error
+    );
 
-    res.status(error.statusCode || 500).json({
-      message: error.statusCode
-        ? error.message
-        : "Failed to login"
-    });
+    res
+      .status(error.statusCode || 500)
+      .json({
+        message: error.statusCode
+          ? error.message
+          : "Failed to login"
+      });
   }
 }
 

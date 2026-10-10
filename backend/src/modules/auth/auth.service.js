@@ -1,7 +1,9 @@
 const bcrypt = require("bcrypt");
 const User = require("../users/user.model.js");
 
-async function signup({ username, email, password }) {
+async function signup(data) {
+  const { username, email, password } = data;
+
   if (!username || !email || !password) {
     const error = new Error(
       "Username, email and password are required"
@@ -18,13 +20,16 @@ async function signup({ username, email, password }) {
     throw error;
   }
 
+  const normalizedEmail =
+    email.toLowerCase().trim();
+
   const existingUser = await User.findOne({
-    email: email.toLowerCase()
+    email: normalizedEmail
   });
 
   if (existingUser) {
     const error = new Error(
-      "Email is already registered"
+      "Email already in use"
     );
     error.statusCode = 409;
     throw error;
@@ -37,19 +42,20 @@ async function signup({ username, email, password }) {
 
   const user = await User.create({
     username,
-    email,
+    email: normalizedEmail,
     passwordHash
   });
 
   return {
     _id: user._id,
     username: user.username,
-    email: user.email,
-    createdAt: user.createdAt
+    email: user.email
   };
 }
 
-async function login({ email, password }) {
+async function login(data) {
+  const { email, password } = data;
+
   if (!email || !password) {
     const error = new Error(
       "Email and password are required"
@@ -58,8 +64,11 @@ async function login({ email, password }) {
     throw error;
   }
 
+  const normalizedEmail =
+    email.toLowerCase().trim();
+
   const user = await User.findOne({
-    email: email.toLowerCase()
+    email: normalizedEmail
   }).select("+passwordHash");
 
   if (!user) {
@@ -70,10 +79,11 @@ async function login({ email, password }) {
     throw error;
   }
 
-  const passwordMatches = await bcrypt.compare(
-    password,
-    user.passwordHash
-  );
+  const passwordMatches =
+    await bcrypt.compare(
+      password,
+      user.passwordHash
+    );
 
   if (!passwordMatches) {
     const error = new Error(

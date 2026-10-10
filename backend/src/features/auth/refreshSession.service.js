@@ -1,13 +1,14 @@
 const RefreshSession =
-  require("./refreshSession.model");
+  require("./refreshSession.model.js");
 
 const {
   createRefreshToken,
   hashRefreshToken
-} = require("./token.service");
+} = require("../../modules/auth/token.service.js");
 
 async function createSession(userId) {
-  const refreshToken = createRefreshToken();
+  const refreshToken =
+    createRefreshToken();
 
   const tokenHash =
     hashRefreshToken(refreshToken);
