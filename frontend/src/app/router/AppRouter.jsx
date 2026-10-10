@@ -8,6 +8,9 @@ import {
 import LoginPage
   from "../../features/auth/pages/LoginPage.jsx";
 
+import SignupPage
+  from "../../features/auth/pages/SignupPage.jsx";
+
 import ProtectedRoute
   from "../../features/auth/components/ProtectedRoute.jsx";
 
