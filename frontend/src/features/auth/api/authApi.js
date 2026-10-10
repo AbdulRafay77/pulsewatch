@@ -24,3 +24,24 @@ export async function getCurrentUser() {
 
   return response.data.user;
 }
+
+let refreshPromise = null;
+
+export async function refreshSession() {
+  if (!refreshPromise) {
+    refreshPromise = api
+      .post("/auth/refresh")
+      .then((response) => response.data)
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+
+  return refreshPromise;
+}
+
+export async function logoutUser() {
+  const response = await api.post("/auth/logout");
+
+  return response.data;
+}

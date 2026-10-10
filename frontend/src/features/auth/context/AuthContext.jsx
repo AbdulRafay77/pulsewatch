@@ -1,12 +1,15 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useState
 } from "react";
 
 import {
   loginUser,
   signupUser,
+  refreshSession,
+  logoutUser
 } from "../api/authApi.js";
 
 import {
@@ -17,6 +20,31 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+
+  const [authLoading, setAuthLoading] =
+    useState(true);
+
+  useEffect(() => {
+    async function restoreSession() {
+      try {
+        const data =
+          await refreshSession();
+
+        setAccessToken(
+          data.accessToken
+        );
+
+        setUser(data.user);
+      } catch {
+        setAccessToken(null);
+        setUser(null);
+      } finally {
+        setAuthLoading(false);
+      }
+    }
+
+    restoreSession();
+  }, []);
 
   async function signup(username, email, password) {
     const data = await signupUser(
@@ -39,9 +67,13 @@ export function AuthProvider({ children }) {
     setUser(data.user);
   }
 
-  function logout() {
-    setAccessToken(null);
-    setUser(null);
+  async function logout() {
+    try {
+      await logoutUser();
+    } finally {
+      setAccessToken(null);
+      setUser(null);
+    }
   }
 
   return (
@@ -50,7 +82,8 @@ export function AuthProvider({ children }) {
         user,
         login,
         signup,
-        logout
+        logout,
+        authLoading
       }}
     >
       {children}
