@@ -6,6 +6,9 @@ const {
   hashRefreshToken
 } = require("../../modules/auth/token.service.js");
 
+const User =
+  require("../../modules/users/user.model.js");
+
 async function createSession(userId) {
   const refreshToken =
     createRefreshToken();
@@ -36,6 +39,51 @@ async function createSession(userId) {
   return refreshToken;
 }
 
+async function rotateSession(refreshToken) {
+  const tokenHash =
+    hashRefreshToken(refreshToken);
+
+  const session =
+    await RefreshSession.findOneAndDelete({
+      tokenHash,
+      expiresAt: {
+        $gt: new Date()
+      }
+    });
+
+  if (!session) {
+    const error = new Error(
+      "Invalid or expired refresh token"
+    );
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const user =
+    await User.findById(session.userId);
+
+  if (!user) {
+    const error = new Error(
+      "User no longer exists"
+    );
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const newRefreshToken =
+    await createSession(user._id);
+
+  return {
+    user: {
+      _id: user._id,
+      username: user.username,
+      email: user.email
+    },
+    refreshToken: newRefreshToken
+  };
+}
+
 module.exports = {
-  createSession
+  createSession,
+  rotateSession
 };

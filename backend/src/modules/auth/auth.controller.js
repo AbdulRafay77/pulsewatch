@@ -115,6 +115,53 @@ async function login(req, res) {
   }
 }
 
+async function refresh(req, res) {
+  try {
+    const refreshToken =
+      req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        message: "Refresh token required"
+      });
+    }
+
+    const {
+      user,
+      refreshToken: newRefreshToken
+    } =
+      await refreshSessionService.rotateSession(
+        refreshToken
+      );
+
+    const accessToken =
+      createAccessToken(user);
+
+    setRefreshCookie(
+      res,
+      newRefreshToken
+    );
+
+    res.status(200).json({
+      user,
+      accessToken
+    });
+  } catch (error) {
+    console.error(
+      "Refresh error:",
+      error
+    );
+
+    res
+      .status(error.statusCode || 500)
+      .json({
+        message: error.statusCode
+          ? error.message
+          : "Failed to refresh session"
+      });
+  }
+}
+
 async function getMe(req, res) {
   res.status(200).json({
     user: {
@@ -128,5 +175,6 @@ async function getMe(req, res) {
 module.exports = {
   signup,
   login,
+  refresh,
   getMe
 };
