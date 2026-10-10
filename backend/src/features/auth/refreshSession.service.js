@@ -83,7 +83,17 @@ async function rotateSession(refreshToken) {
   };
 }
 
+async function revokeSession(refreshToken) {
+  const tokenHash =
+    hashRefreshToken(refreshToken);
+
+  await RefreshSession.deleteOne({
+    tokenHash
+  });
+}
+
 module.exports = {
   createSession,
-  rotateSession
+  rotateSession,
+  revokeSession
 };

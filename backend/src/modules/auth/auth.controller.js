@@ -36,6 +36,22 @@ function setRefreshCookie(res, refreshToken) {
   );
 }
 
+function clearRefreshCookie(res) {
+  res.clearCookie(
+    "refreshToken",
+    {
+      httpOnly: true,
+
+      secure:
+        process.env.NODE_ENV === "production",
+
+      sameSite: "lax",
+
+      path: "/api/auth"
+    }
+  );
+}
+
 async function signup(req, res) {
   try {
     const user =
@@ -159,6 +175,34 @@ async function refresh(req, res) {
           ? error.message
           : "Failed to refresh session"
       });
+  }
+}
+
+async function logout(req, res) {
+  try {
+    const refreshToken =
+      req.cookies.refreshToken;
+
+    if (refreshToken) {
+      await refreshSessionService.revokeSession(
+        refreshToken
+      );
+    }
+
+    clearRefreshCookie(res);
+
+    res.status(200).json({
+      message: "Logged out successfully"
+    });
+  } catch (error) {
+    console.error(
+      "Logout error:",
+      error
+    );
+
+    res.status(500).json({
+      message: "Failed to logout"
+    });
   }
 }
 
