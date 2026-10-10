@@ -5,7 +5,8 @@ import {
 } from "react";
 
 import {
-  loginUser
+  loginUser,
+  signupUser,
 } from "../api/authApi.js";
 
 import {
@@ -16,6 +17,17 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+
+  async function signup(username, email, password) {
+    const data = await signupUser(
+      username,
+      email,
+      password
+    );
+
+    setAccessToken(data.accessToken);
+    setUser(data.user);
+  }
 
   async function login(email, password) {
     const data = await loginUser(
@@ -37,6 +49,7 @@ export function AuthProvider({ children }) {
       value={{
         user,
         login,
+        signup,
         logout
       }}
     >

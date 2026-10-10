@@ -24,6 +24,7 @@ function AppRouter() {
       <Navbar />
 
       <Routes>
+        
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
         <Route
@@ -35,7 +36,12 @@ function AppRouter() {
           }
         />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<h1>Signup</h1>} />
+
+        <Route 
+          path="/signup" 
+          element={<SignupPage />}
+        />
+
         <Route 
           path="/monitors" 
           element={
@@ -44,6 +50,7 @@ function AppRouter() {
             </ProtectedRoute>
           }
         />
+
         <Route 
           path="/monitors/:id" 
           element={
@@ -52,6 +59,7 @@ function AppRouter() {
             </ProtectedRoute>
           } 
         />
+
         <Route 
           path="/incidents" 
           element={
@@ -60,6 +68,7 @@ function AppRouter() {
             </ProtectedRoute>
           } 
         />
+
       </Routes>
     </BrowserRouter>
   );
