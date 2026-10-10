@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
+const dotenv = require("dotenv");
 
 const connectDB = require("./config/db.js");
 const monitorRoutes = require("./modules/monitors/monitor.routes.js");
@@ -19,7 +19,8 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173"
+    origin: "http://localhost:5173",
+    credentials: true
   })
 );
 
