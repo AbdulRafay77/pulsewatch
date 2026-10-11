@@ -2,6 +2,7 @@ import useDashboard from "../hooks/useDashboard.js";
 import StatCard from "../components/StatCard.jsx";
 import MonitorOverview from "../components/MonitorOverview.jsx";
 import ActiveIncidents from "../components/ActiveIncidents.jsx";
+import NotificationTest from "../../notifications/components/NotificationTest.jsx";
 
 function Dashboard() {
   const {
@@ -69,6 +70,8 @@ function Dashboard() {
   return (
     <div>
       <h1>PulseWatch Dashboard</h1>
+
+      <NotificationTest />
 
       <p>
         Current overview of your monitored services.
