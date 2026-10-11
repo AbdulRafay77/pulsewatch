@@ -21,7 +21,7 @@ async function getMonitors(userId) {
 }
 
 async function getMonitorById(userId, monitorId) {
-  const monitor = await Monitor.fineOne({
+  const monitor = await Monitor.findOne({
     _id: monitorId,
     userId
   });
