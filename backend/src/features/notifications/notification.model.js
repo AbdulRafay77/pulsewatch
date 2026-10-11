@@ -58,10 +58,20 @@ const notificationSchema =
     }
   );
 
-notificationSchema.index({
-  userId: 1,
-  createdAt: -1
-});
+notificationSchema.index(
+  {
+    incidentId: 1,
+    type: 1
+  },
+  {
+    unique: true,
+    partialFilterExpression: {
+      incidentId: {
+        $type: "objectId"
+      }
+    }
+  }
+);
 
 module.exports = mongoose.model(
   "Notification",

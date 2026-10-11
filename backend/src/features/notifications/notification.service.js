@@ -21,6 +21,50 @@ async function createNotification(data) {
   });
 }
 
+async function createIncidentNotification({
+  userId,
+  monitorId,
+  incidentId,
+  type,
+  title,
+  message
+}) {
+  try {
+    return await Notification.findOneAndUpdate(
+      {
+        incidentId,
+        type
+      },
+      {
+        $setOnInsert: {
+          userId,
+          monitorId,
+          incidentId,
+          type,
+          title,
+          message,
+          isRead: false,
+          readAt: null
+        }
+      },
+      {
+        upsert: true,
+        returnDocument: "after",
+        runValidators: true
+      }
+    );
+  } catch (error) {
+    if (error.code === 11000) {
+      return Notification.findOne({
+        incidentId,
+        type
+      });
+    }
+
+    throw error;
+  }
+}
+
 async function getNotifications(userId) {
   return Notification.find({
     userId
@@ -92,6 +136,7 @@ async function markAllAsRead(userId) {
 
 module.exports = {
   createNotification,
+  createIncidentNotification,
   getNotifications,
   getUnreadCount,
   markAsRead,

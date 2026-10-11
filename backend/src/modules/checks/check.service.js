@@ -2,6 +2,7 @@ const Monitor = require("../monitors/monitor.model");
 const Check = require("./check.model");
 const checkMonitor = require("../../services/checkMonitor");
 const incidentService = require("../incidents/incident.service.js");
+const notificationService = require("../../features/notifications/notification.service.js");
 
 async function runMonitorCheck(monitorId) {
   const monitor = await Monitor.findById(monitorId);
@@ -39,21 +40,58 @@ async function runMonitorCheck(monitorId) {
     newStatus === "down" &&
     previousStatus !== "down"
   ) {
-    await incidentService.createIncident(
-      monitor,
-      result,
-      checkedAt
-    );
+    const incident =
+      await incidentService.createIncident(
+        monitor,
+        result,
+        check.checkedAt
+      );
+
+    if (incident) {
+      await notificationService.createIncidentNotification({
+        userId: monitor.userId,
+        monitorId: monitor._id,
+        incidentId: incident._id,
+
+        type: "monitor_down",
+
+        title: `${monitor.name} is down`,
+
+        message:
+          result.errorMessage ||
+          (
+            result.statusCode
+              ? `${monitor.name} returned HTTP ${result.statusCode}.`
+              : `${monitor.name} is currently unreachable.`
+          )
+      });
+    }
   }
 
   if (
     newStatus === "up" &&
     previousStatus === "down"
   ) {
-    await incidentService.resolveIncident(
-      monitor._id,
-      checkedAt
-    );
+    const incident =
+      await incidentService.resolveIncident(
+        monitor._id,
+        check.checkedAt
+      );
+
+    if (incident) {
+      await notificationService.createIncidentNotification({
+        userId: monitor.userId,
+        monitorId: monitor._id,
+        incidentId: incident._id,
+
+        type: "monitor_recovered",
+
+        title: `${monitor.name} recovered`,
+
+        message:
+          `${monitor.name} is responding normally again.`
+      });
+    }
   }
 
   monitor.status = newStatus;
