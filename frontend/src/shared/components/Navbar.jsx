@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../features/auth/context/AuthContext.jsx";
+import NotificationBell from "../../features/notifications/components/NotificationBell.jsx";
 
 function Navbar() {
   const { user, logout } = useAuth();
@@ -19,6 +20,8 @@ function Navbar() {
       <Link to="/signup">Sign Up</Link>
       {user && (
         <>
+          <NotificationBell />
+
           <span>{user.username}</span>
 
           <button onClick={handleLogout}>

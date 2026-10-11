@@ -71,8 +71,6 @@ function Dashboard() {
     <div>
       <h1>PulseWatch Dashboard</h1>
 
-      <NotificationTest />
-
       <p>
         Current overview of your monitored services.
       </p>
