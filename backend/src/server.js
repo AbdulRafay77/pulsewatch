@@ -13,6 +13,9 @@ const incidentRoutes = require("./modules/incidents/incident.routes.js");
 const authRoutes =
   require("./modules/auth/auth.routes.js");
 
+const notificationRoutes =
+  require("./features/notifications/notification.routes.js");
+
 dotenv.config();
 
 const app = express();
@@ -28,7 +31,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
-
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/monitors", monitorRoutes);
 app.use("/api/incidents", incidentRoutes);
 
