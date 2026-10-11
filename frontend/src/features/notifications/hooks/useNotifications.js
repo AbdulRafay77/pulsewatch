@@ -16,9 +16,12 @@ export function useNotifications() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  async function loadNotifications() {
+  async function loadNotifications(showLoading = false) {
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
+
       setError("");
 
       const [
@@ -29,10 +32,7 @@ export function useNotifications() {
         getUnreadCount()
       ]);
 
-      setNotifications(
-        notificationData
-      );
-
+      setNotifications(notificationData);
       setUnreadCount(count);
     } catch (error) {
       setError(
@@ -40,7 +40,9 @@ export function useNotifications() {
         "Failed to load notifications"
       );
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   }
 
@@ -85,7 +87,17 @@ export function useNotifications() {
   }
 
   useEffect(() => {
-    loadNotifications();
+    // Initial load
+    loadNotifications(true);
+
+    // Refresh notifications every 10 seconds
+    const intervalId = setInterval(() => {
+      loadNotifications(false);
+    }, 10000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
 
   return {

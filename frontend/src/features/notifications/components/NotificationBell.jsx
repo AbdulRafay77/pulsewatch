@@ -14,7 +14,8 @@ function NotificationBell() {
     loading,
     error,
     markAsRead,
-    markAllAsRead
+    markAllAsRead,
+    reload
   } = useNotifications();
 
   async function handleNotificationClick(notification) {
@@ -49,9 +50,15 @@ function NotificationBell() {
     >
       <button
         type="button"
-        onClick={() =>
-          setOpen((current) => !current)
-        }
+        onClick={() => {
+          const nextOpen = !open;
+
+          setOpen(nextOpen);
+
+          if (nextOpen) {
+            reload(false);
+          }
+        }}
         style={{
           position: "relative",
           cursor: "pointer",
