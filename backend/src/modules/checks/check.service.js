@@ -2,7 +2,13 @@ const Monitor = require("../monitors/monitor.model");
 const Check = require("./check.model");
 const checkMonitor = require("../../services/checkMonitor");
 const incidentService = require("../incidents/incident.service.js");
-const notificationService = require("../../features/notifications/notification.service.js");
+
+const notificationService =
+  require("../../features/notifications/notification.service.js");
+
+const alertEmailService =
+  require("../../features/notifications/alertEmail.service.js");
+
 
 async function runMonitorCheck(monitorId) {
   const monitor = await Monitor.findById(monitorId);
@@ -34,7 +40,13 @@ async function runMonitorCheck(monitorId) {
     checkedAt
   });
 
-  const newStatus = result.success ? "up" : "down";
+  const newStatus =
+    result.success ? "up" : "down";
+
+
+  // --------------------------------
+  // TRANSITION: UP/UNKNOWN -> DOWN
+  // --------------------------------
 
   if (
     newStatus === "down" &&
@@ -48,25 +60,52 @@ async function runMonitorCheck(monitorId) {
       );
 
     if (incident) {
-      await notificationService.createIncidentNotification({
-        userId: monitor.userId,
-        monitorId: monitor._id,
-        incidentId: incident._id,
+      const message =
+        result.errorMessage ||
+        (
+          result.statusCode
+            ? `${monitor.name} returned HTTP ${result.statusCode}.`
+            : `${monitor.name} is currently unreachable.`
+        );
 
-        type: "monitor_down",
+      const { created } =
+        await notificationService
+          .createIncidentNotification({
+            userId: monitor.userId,
+            monitorId: monitor._id,
+            incidentId: incident._id,
 
-        title: `${monitor.name} is down`,
+            type: "monitor_down",
 
-        message:
-          result.errorMessage ||
-          (
-            result.statusCode
-              ? `${monitor.name} returned HTTP ${result.statusCode}.`
-              : `${monitor.name} is currently unreachable.`
-          )
-      });
+            title:
+              `${monitor.name} is down`,
+
+            message
+          });
+
+      if (created) {
+        alertEmailService
+          .sendIncidentAlertEmail({
+            userId: monitor.userId,
+            monitor,
+            incident,
+            type: "monitor_down",
+            message
+          })
+          .catch((error) => {
+            console.error(
+              "Failed to send DOWN alert email:",
+              error.message
+            );
+          });
+      }
     }
   }
+
+
+  // --------------------------------
+  // TRANSITION: DOWN -> UP
+  // --------------------------------
 
   if (
     newStatus === "up" &&
@@ -79,20 +118,43 @@ async function runMonitorCheck(monitorId) {
       );
 
     if (incident) {
-      await notificationService.createIncidentNotification({
-        userId: monitor.userId,
-        monitorId: monitor._id,
-        incidentId: incident._id,
+      const message =
+        `${monitor.name} is responding normally again.`;
 
-        type: "monitor_recovered",
+      const { created } =
+        await notificationService
+          .createIncidentNotification({
+            userId: monitor.userId,
+            monitorId: monitor._id,
+            incidentId: incident._id,
 
-        title: `${monitor.name} recovered`,
+            type: "monitor_recovered",
 
-        message:
-          `${monitor.name} is responding normally again.`
-      });
+            title:
+              `${monitor.name} recovered`,
+
+            message
+          });
+
+      if (created) {
+        alertEmailService
+          .sendIncidentAlertEmail({
+            userId: monitor.userId,
+            monitor,
+            incident,
+            type: "monitor_recovered",
+            message
+          })
+          .catch((error) => {
+            console.error(
+              "Failed to send RECOVERY alert email:",
+              error.message
+            );
+          });
+      }
     }
   }
+
 
   monitor.status = newStatus;
   monitor.lastCheckedAt = checkedAt;
@@ -105,39 +167,56 @@ async function runMonitorCheck(monitorId) {
   };
 }
 
-async function getChecksByMonitor(userId, monitorId) {
+
+async function getChecksByMonitor(
+  userId,
+  monitorId
+) {
   const monitor = await Monitor.findOne({
     _id: monitorId,
     userId
   });
 
   if (!monitor) {
-    const error = new Error("Monitor not found");
+    const error =
+      new Error("Monitor not found");
+
     error.statusCode = 404;
+
     throw error;
   }
 
   return Check.find({
     monitorId
   })
-    .sort({ checkedAt: -1 })
+    .sort({
+      checkedAt: -1
+    })
     .limit(50);
 }
 
-async function runUserMonitorCheck(userId, monitorId) {
+
+async function runUserMonitorCheck(
+  userId,
+  monitorId
+) {
   const monitor = await Monitor.findOne({
     _id: monitorId,
     userId
   });
 
   if (!monitor) {
-    const error = new Error("Monitor not found");
+    const error =
+      new Error("Monitor not found");
+
     error.statusCode = 404;
+
     throw error;
   }
 
   return runMonitorCheck(monitorId);
 }
+
 
 module.exports = {
   runMonitorCheck,

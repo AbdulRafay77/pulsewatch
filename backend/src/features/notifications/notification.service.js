@@ -30,35 +30,34 @@ async function createIncidentNotification({
   message
 }) {
   try {
-    return await Notification.findOneAndUpdate(
-      {
+    const notification =
+      await Notification.create({
+        userId,
+        monitorId,
         incidentId,
-        type
-      },
-      {
-        $setOnInsert: {
-          userId,
-          monitorId,
-          incidentId,
-          type,
-          title,
-          message,
-          isRead: false,
-          readAt: null
-        }
-      },
-      {
-        upsert: true,
-        returnDocument: "after",
-        runValidators: true
-      }
-    );
+        type,
+        title,
+        message,
+        isRead: false,
+        readAt: null
+      });
+
+    return {
+      notification,
+      created: true
+    };
   } catch (error) {
     if (error.code === 11000) {
-      return Notification.findOne({
-        incidentId,
-        type
-      });
+      const notification =
+        await Notification.findOne({
+          incidentId,
+          type
+        });
+
+      return {
+        notification,
+        created: false
+      };
     }
 
     throw error;
