@@ -22,6 +22,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       select: false
+    },
+
+    emailAlertsEnabled: {
+      type: Boolean,
+      default: true
     }
   },
   {

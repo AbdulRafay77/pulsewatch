@@ -14,12 +14,26 @@ async function sendIncidentAlertEmail({
 }) {
   const user = await User.findById(
     userId
-  ).select("email username");
+  ).select("email username emailAlertsEnabled");
 
   if (!user) {
     throw new Error(
       "Cannot send alert email: user not found"
     );
+  }
+
+  console.log(
+    "Email preference:",
+    user.emailAlertsEnabled,
+    "Type:",
+    typeof user.emailAlertsEnabled
+  );
+
+  if (user.emailAlertsEnabled === false) {
+    return {
+      skipped: true,
+      reason: "email_alerts_disabled"
+    };
   }
 
   const frontendUrl =
@@ -82,7 +96,9 @@ ${incident._id}
     </p>
   `;
 
-  console.log("Sending PulseWatch alert email to:", user.email);
+  console.log(
+    `[EMAIL] ${type} | ${monitor.name} | ${user.email}`
+  );
 
   return sendEmail({
     to: user.email,
