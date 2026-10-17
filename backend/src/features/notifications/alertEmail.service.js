@@ -82,6 +82,8 @@ ${incident._id}
     </p>
   `;
 
+  console.log("Sending PulseWatch alert email to:", user.email);
+
   return sendEmail({
     to: user.email,
     subject,

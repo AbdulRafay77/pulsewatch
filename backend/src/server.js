@@ -1,7 +1,7 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const dotenv = require("dotenv");
 
 const connectDB = require("./config/db.js");
 const monitorRoutes = require("./modules/monitors/monitor.routes.js");
@@ -15,8 +15,6 @@ const authRoutes =
 
 const notificationRoutes =
   require("./features/notifications/notification.routes.js");
-
-dotenv.config();
 
 const app = express();
 
