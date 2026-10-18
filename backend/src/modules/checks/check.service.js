@@ -1,6 +1,6 @@
 const Monitor = require("../monitors/monitor.model");
 const Check = require("./check.model");
-const checkMonitor = require("../../services/checkMonitor");
+const checkWithRetries = require("../../services/checkWithRetries.js");
 const incidentService = require("../incidents/incident.service.js");
 
 const notificationService =
@@ -27,7 +27,7 @@ async function runMonitorCheck(monitorId) {
 
   const previousStatus = monitor.status;
 
-  const result = await checkMonitor(monitor);
+  const result = await checkWithRetries(monitor);
 
   const checkedAt = new Date();
 
