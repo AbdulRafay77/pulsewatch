@@ -16,6 +16,9 @@ const authRoutes =
 const notificationRoutes =
   require("./features/notifications/notification.routes.js");
 
+const userRoutes =
+  require("./modules/users/user.routes.js");
+
 const app = express();
 
 app.use(
@@ -29,6 +32,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/monitors", monitorRoutes);
 app.use("/api/incidents", incidentRoutes);
