@@ -18,6 +18,7 @@ function Navbar() {
       <Link to="/incidents">Incidents</Link>
       <Link to="/login">Login</Link>
       <Link to="/signup">Sign Up</Link>
+      <Link to="/settings">Settings</Link>
       {user && (
         <>
           <NotificationBell />

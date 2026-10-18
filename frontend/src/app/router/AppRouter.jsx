@@ -20,6 +20,8 @@ import IncidentsPage from "../../features/incidents/pages/IncidentsPage";
 import Navbar from "../../shared/components/Navbar";
 import MonitorDetailsPage
   from "../../features/monitors/pages/MonitorDetailsPage";
+import SettingsPage
+  from "../../features/settings/pages/SettingsPage.jsx";
 
 function AppRouter() {
   return (
@@ -70,6 +72,15 @@ function AppRouter() {
               <IncidentsPage />
             </ProtectedRoute>
           } 
+        />
+
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
+            </ProtectedRoute>
+          }
         />
 
       </Routes>
