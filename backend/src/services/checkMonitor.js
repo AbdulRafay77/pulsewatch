@@ -1,5 +1,6 @@
 const dns = require("dns").promises;
 const ipaddr = require("ipaddr.js");
+const { Agent, fetch } = require("undici");
 
 class UnsafeTargetError extends Error {
   constructor(message) {
@@ -45,7 +46,6 @@ async function validateTargetUrl(targetUrl) {
     .toLowerCase()
     .replace(/\.$/, "");
 
-  // Node URL.hostname keeps brackets around IPv6 literals.
   if (hostname.startsWith("[") && hostname.endsWith("]")) {
     hostname = hostname.slice(1, -1);
   }
@@ -63,6 +63,10 @@ async function validateTargetUrl(targetUrl) {
     all: true
   });
 
+  if (addresses.length === 0) {
+    throw new Error("Hostname could not be resolved");
+  }
+
   for (const address of addresses) {
     if (isUnsafeIp(address.address)) {
       throw new UnsafeTargetError(
@@ -70,6 +74,28 @@ async function validateTargetUrl(targetUrl) {
       );
     }
   }
+
+  const selectedAddress = addresses[0];
+
+  return {
+    address: selectedAddress.address,
+    family: selectedAddress.family
+  };
+}
+
+function createPinnedDispatcher(address, family) {
+  return new Agent({
+    connect: {
+      lookup(hostname, options, callback) {
+        if (options?.all) {
+          callback(null, [{ address, family }]);
+          return;
+        }
+
+        callback(null, address, family);
+      }
+    }
+  });
 }
 
 async function checkMonitor(monitor) {
@@ -82,22 +108,36 @@ async function checkMonitor(monitor) {
   const startedAt = Date.now();
 
   try {
-    await validateTargetUrl(monitor.url);
+    const validatedTarget = await validateTargetUrl(monitor.url);
 
-    const response = await fetch(monitor.url, {
-      method: "GET",
-      signal: controller.signal,
-      redirect: "manual"
-    });
+    const dispatcher = createPinnedDispatcher(
+      validatedTarget.address,
+      validatedTarget.family
+    );
 
-    const responseTime = Date.now() - startedAt;
+    try {
+      const response = await fetch(monitor.url, {
+        method: "GET",
+        signal: controller.signal,
+        redirect: "manual",
+        dispatcher
+      });
 
-    return {
-      success: response.ok,
-      statusCode: response.status,
-      responseTime,
-      errorMessage: null
-    };
+      const responseTime = Date.now() - startedAt;
+
+      if (response.body) {
+        await response.body.cancel();
+      }
+
+      return {
+        success: response.ok,
+        statusCode: response.status,
+        responseTime,
+        errorMessage: null
+      };
+    } finally {
+      await dispatcher.close();
+    }
   } catch (error) {
     if (error.name === "UnsafeTargetError") {
       throw error;
