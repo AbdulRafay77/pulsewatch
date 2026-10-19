@@ -2,6 +2,16 @@ const dns = require("dns").promises;
 const ipaddr = require("ipaddr.js");
 const { Agent, fetch } = require("undici");
 
+const MAX_REDIRECTS = 5;
+
+const REDIRECT_STATUS_CODES = new Set([
+  301,
+  302,
+  303,
+  307,
+  308
+]);
+
 class UnsafeTargetError extends Error {
   constructor(message) {
     super(message);
@@ -98,6 +108,64 @@ function createPinnedDispatcher(address, family) {
   });
 }
 
+async function fetchWithSafeRedirects(targetUrl, signal) {
+  let currentUrl = targetUrl;
+
+  for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount++) {
+    const validatedTarget = await validateTargetUrl(currentUrl);
+
+    const dispatcher = createPinnedDispatcher(
+      validatedTarget.address,
+      validatedTarget.family
+    );
+
+    try {
+      const response = await fetch(currentUrl, {
+        method: "GET",
+        signal,
+        redirect: "manual",
+        dispatcher
+      });
+
+      const isRedirect = REDIRECT_STATUS_CODES.has(response.status);
+
+      if (!isRedirect) {
+        if (response.body) {
+          await response.body.cancel();
+        }
+
+        return {
+          success: response.ok,
+          statusCode: response.status
+        };
+      }
+
+      const location = response.headers.get("location");
+
+      if (response.body) {
+        await response.body.cancel();
+      }
+
+      if (!location) {
+        return {
+          success: false,
+          statusCode: response.status
+        };
+      }
+
+      if (redirectCount === MAX_REDIRECTS) {
+        throw new Error("Too many redirects");
+      }
+
+      currentUrl = new URL(location, currentUrl).toString();
+    } finally {
+      await dispatcher.close();
+    }
+  }
+
+  throw new Error("Too many redirects");
+}
+
 async function checkMonitor(monitor) {
   const controller = new AbortController();
 
@@ -108,36 +176,19 @@ async function checkMonitor(monitor) {
   const startedAt = Date.now();
 
   try {
-    const validatedTarget = await validateTargetUrl(monitor.url);
-
-    const dispatcher = createPinnedDispatcher(
-      validatedTarget.address,
-      validatedTarget.family
+    const result = await fetchWithSafeRedirects(
+      monitor.url,
+      controller.signal
     );
 
-    try {
-      const response = await fetch(monitor.url, {
-        method: "GET",
-        signal: controller.signal,
-        redirect: "manual",
-        dispatcher
-      });
+    const responseTime = Date.now() - startedAt;
 
-      const responseTime = Date.now() - startedAt;
-
-      if (response.body) {
-        await response.body.cancel();
-      }
-
-      return {
-        success: response.ok,
-        statusCode: response.status,
-        responseTime,
-        errorMessage: null
-      };
-    } finally {
-      await dispatcher.close();
-    }
+    return {
+      success: result.success,
+      statusCode: result.statusCode,
+      responseTime,
+      errorMessage: null
+    };
   } catch (error) {
     if (error.name === "UnsafeTargetError") {
       throw error;
