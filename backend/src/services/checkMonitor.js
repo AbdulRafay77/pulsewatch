@@ -12,30 +12,6 @@ const REDIRECT_STATUS_CODES = new Set([
   308
 ]);
 
-function shouldRetry(result) {
-  if (result.errorMessage === "Too many redirects") {
-    return false;
-  }
-
-  if (result.statusCode === null) {
-    return true;
-  }
-
-  if (result.statusCode === 408) {
-    return true;
-  }
-
-  if (result.statusCode === 429) {
-    return true;
-  }
-
-  if (result.statusCode >= 500 && result.statusCode <= 599) {
-    return true;
-  }
-
-  return false;
-}
-
 class UnsafeTargetError extends Error {
   constructor(message) {
     super(message);

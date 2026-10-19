@@ -2,20 +2,34 @@ const monitorService = require("./monitor.service.js");
 
 async function createMonitor(req, res) {
   try {
-    console.log("CONTROLLER userId:", req.user._id);
-    console.log("CONTROLLER body:", req.body);
+    const allowedFields = [
+      "name",
+      "url",
+      "intervalMinutes",
+      "timeoutMs"
+    ];
+
+    const data = {};
+
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        data[field] = req.body[field];
+      }
+    }
 
     const monitor = await monitorService.createMonitor(
       req.user._id,
-      req.body
+      data
     );
 
     res.status(201).json(monitor);
   } catch (error) {
     console.error("Create monitor error:", error);
 
-    res.status(500).json({
-      message: "Failed to create monitor"
+    res.status(error.statusCode || 500).json({
+      message: error.statusCode
+        ? error.message
+        : "Failed to create monitor"
     });
   }
 }

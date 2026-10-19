@@ -1,13 +1,14 @@
 const Monitor = require("./monitor.model");
 const Check = require("../checks/check.model.js");
 const Incident = require("../incidents/incident.model.js");
+const { validateMonitorUrl } = require("./monitorUrl.Validator.js");
 
 async function createMonitor(userId, data) {
-  console.log("SERVICE userId:", userId);
-  console.log("SERVICE data:", data);
+  const validatedUrl = validateMonitorUrl(data.url);
 
   return Monitor.create({
     ...data,
+    url: validatedUrl,
     userId
   });
 }
@@ -36,12 +37,18 @@ async function getMonitorById(userId, monitorId) {
 }
 
 async function updateMonitor(userId, monitorId, updates) {
+  const safeUpdates = { ...updates };
+
+  if (Object.prototype.hasOwnProperty.call(safeUpdates, "url")) {
+    safeUpdates.url = validateMonitorUrl(safeUpdates.url);
+  }
+
   const monitor = await Monitor.findOneAndUpdate(
     {
       _id: monitorId,
       userId
     },
-    updates,
+    safeUpdates,
     {
       returnDocument: "after",
       runValidators: true

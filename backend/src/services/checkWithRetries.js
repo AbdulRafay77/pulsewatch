@@ -4,23 +4,24 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+
 function shouldRetry(result) {
-  // Network, DNS, timeout, etc.
+  if (result.errorMessage === "Too many redirects") {
+    return false;
+  }
+
   if (result.statusCode === null) {
     return true;
   }
 
-  // Request Timeout
   if (result.statusCode === 408) {
     return true;
   }
 
-  // Too Many Requests
   if (result.statusCode === 429) {
     return true;
   }
 
-  // Server errors
   if (result.statusCode >= 500 && result.statusCode <= 599) {
     return true;
   }
