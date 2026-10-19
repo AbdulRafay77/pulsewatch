@@ -1,47 +1,36 @@
 const dns = require("dns").promises;
-const net = require("net");
+const ipaddr = require("ipaddr.js");
 
 class UnsafeTargetError extends Error {
   constructor(message) {
     super(message);
     this.name = "UnsafeTargetError";
+    this.statusCode = 400;
   }
 }
 
-function isPrivateIPv4(ip) {
-  const parts = ip.split(".").map(Number);
-
-  if (parts[0] === 10) return true;
-
-  if (
-    parts[0] === 172 &&
-    parts[1] >= 16 &&
-    parts[1] <= 31
-  ) {
+function isUnsafeIp(ip) {
+  if (!ipaddr.isValid(ip)) {
     return true;
   }
 
-  if (
-    parts[0] === 192 &&
-    parts[1] === 168
-  ) {
-    return true;
+  let address = ipaddr.parse(ip);
+
+  if (address.kind() === "ipv6" && address.isIPv4MappedAddress()) {
+    address = address.toIPv4Address();
   }
 
-  if (parts[0] === 127) return true;
-
-  if (
-    parts[0] === 169 &&
-    parts[1] === 254
-  ) {
-    return true;
-  }
-
-  return false;
+  return address.range() !== "unicast";
 }
 
 async function validateTargetUrl(targetUrl) {
-  const parsedUrl = new URL(targetUrl);
+  let parsedUrl;
+
+  try {
+    parsedUrl = new URL(targetUrl);
+  } catch {
+    throw new UnsafeTargetError("Invalid URL");
+  }
 
   if (
     parsedUrl.protocol !== "http:" &&
@@ -52,38 +41,32 @@ async function validateTargetUrl(targetUrl) {
     );
   }
 
+  let hostname = parsedUrl.hostname
+    .toLowerCase()
+    .replace(/\.$/, "");
+
+  // Node URL.hostname keeps brackets around IPv6 literals.
+  if (hostname.startsWith("[") && hostname.endsWith("]")) {
+    hostname = hostname.slice(1, -1);
+  }
+
   if (
-    parsedUrl.hostname === "localhost" ||
-    parsedUrl.hostname === "::1"
+    hostname === "localhost" ||
+    hostname.endsWith(".localhost")
   ) {
     throw new UnsafeTargetError(
       "Local addresses are not allowed"
     );
   }
 
-  const addresses = await dns.lookup(parsedUrl.hostname, {
+  const addresses = await dns.lookup(hostname, {
     all: true
   });
 
   for (const address of addresses) {
-    if (
-      net.isIPv4(address.address) &&
-      isPrivateIPv4(address.address)
-    ) {
+    if (isUnsafeIp(address.address)) {
       throw new UnsafeTargetError(
-        "Private network addresses are not allowed"
-      );
-    }
-
-    if (
-      net.isIPv6(address.address) &&
-      (
-        address.address === "::1" ||
-        address.address.startsWith("fe80:")
-      )
-    ) {
-      throw new UnsafeTargetError(
-        "Private network addresses are not allowed"
+        "Private or reserved network addresses are not allowed"
       );
     }
   }
