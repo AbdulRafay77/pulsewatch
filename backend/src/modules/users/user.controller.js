@@ -10,10 +10,12 @@ async function getPreferences(req, res) {
 
     res.status(200).json(preferences);
   } catch (error) {
-    console.error(
-      "Get preferences error:",
-      error
-    );
+    if (!error.statusCode || error.statusCode >= 500) {
+      console.error(
+        "Get preferences error:",
+        error
+      );
+    }
 
     res
       .status(error.statusCode || 500)
@@ -39,10 +41,9 @@ async function updatePreferences(req, res) {
       ...preferences
     });
   } catch (error) {
-    console.error(
-      "Update preferences error:",
-      error
-    );
+    if (!error.statusCode || error.statusCode >= 500){
+      console.error("Update preferences error:", error);
+    }
 
     res
       .status(error.statusCode || 500)
