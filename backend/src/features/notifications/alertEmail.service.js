@@ -22,13 +22,6 @@ async function sendIncidentAlertEmail({
     );
   }
 
-  console.log(
-    "Email preference:",
-    user.emailAlertsEnabled,
-    "Type:",
-    typeof user.emailAlertsEnabled
-  );
-
   if (user.emailAlertsEnabled === false) {
     return {
       skipped: true,
@@ -95,10 +88,6 @@ ${incident._id}
       </a>
     </p>
   `;
-
-  console.log(
-    `[EMAIL] ${type} | ${monitor.name} | ${user.email}`
-  );
 
   return sendEmail({
     to: user.email,
