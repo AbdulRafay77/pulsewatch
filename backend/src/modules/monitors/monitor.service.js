@@ -1,7 +1,7 @@
 const Monitor = require("./monitor.model");
 const Check = require("../checks/check.model.js");
 const Incident = require("../incidents/incident.model.js");
-const { validateMonitorUrl } = require("./monitorUrl.Validator.js");
+const validateMonitorUrl = require("./monitorUrl.Validator.js");
 
 async function createMonitor(userId, data) {
   const validatedUrl = validateMonitorUrl(data.url);
