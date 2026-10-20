@@ -42,6 +42,81 @@ afterAll(async () => {
 });
 
 describe("Monitor Service", () => {
+  test("does not allow another user to read a monitor", async () => {
+    const ownerId = new mongoose.Types.ObjectId();
+    const otherUserId = new mongoose.Types.ObjectId();
+
+    const monitor = await monitorService.createMonitor(ownerId, {
+      name: "Private Monitor",
+      url: "https://example.com"
+    });
+
+    await expect(
+      monitorService.getMonitorById(
+        otherUserId,
+        monitor._id
+      )
+    ).rejects.toMatchObject({
+      statusCode: 404,
+      message: "Monitor not found"
+    });
+  });
+
+  test("does not allow another user to update a monitor", async () => {
+    const ownerId = new mongoose.Types.ObjectId();
+    const otherUserId = new mongoose.Types.ObjectId();
+
+    const monitor = await monitorService.createMonitor(ownerId, {
+      name: "Original Name",
+      url: "https://example.com"
+    });
+
+    await expect(
+      monitorService.updateMonitor(
+        otherUserId,
+        monitor._id,
+        {
+          name: "Hacked Name"
+        }
+      )
+    ).rejects.toMatchObject({
+      statusCode: 404,
+      message: "Monitor not found"
+    });
+
+    const unchangedMonitor = await Monitor.findById(
+      monitor._id
+    );
+
+    expect(unchangedMonitor.name).toBe("Original Name");
+  });
+
+  test("does not allow another user to delete a monitor", async () => {
+    const ownerId = new mongoose.Types.ObjectId();
+    const otherUserId = new mongoose.Types.ObjectId();
+
+    const monitor = await monitorService.createMonitor(ownerId, {
+      name: "Protected Monitor",
+      url: "https://example.com"
+    });
+
+    await expect(
+      monitorService.deleteMonitor(
+        otherUserId,
+        monitor._id
+      )
+    ).rejects.toMatchObject({
+      statusCode: 404,
+      message: "Monitor not found"
+    });
+
+    const existingMonitor = await Monitor.findById(
+      monitor._id
+    );
+
+    expect(existingMonitor).not.toBeNull();
+  });
+
   test("creates and saves a monitor for the correct user", async () => {
     const userId = new mongoose.Types.ObjectId();
 
