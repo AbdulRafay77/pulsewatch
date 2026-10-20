@@ -185,6 +185,80 @@ test("user cannot access another user's monitor", async () => {
 });
 
 describe("Monitor API", () => {
+    test("user cannot update another user's monitor", async () => {
+    const owner = await signupUser({
+      username: "updateOwner",
+      email: "updateowner@example.com"
+    });
+
+    const otherUser = await signupUser({
+      username: "updateOther",
+      email: "updateother@example.com"
+    });
+
+    const createResponse = await request(app)
+      .post("/api/monitors")
+      .set("Authorization", `Bearer ${owner.body.accessToken}`)
+      .send({
+        name: "Original Monitor",
+        url: "https://example.com"
+      });
+
+    const monitorId = createResponse.body._id;
+
+    const response = await request(app)
+      .patch(`/api/monitors/${monitorId}`)
+      .set("Authorization", `Bearer ${otherUser.body.accessToken}`)
+      .send({
+        name: "Hacked Monitor"
+      });
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe("Monitor not found");
+
+    const ownerResponse = await request(app)
+      .get(`/api/monitors/${monitorId}`)
+      .set("Authorization", `Bearer ${owner.body.accessToken}`);
+
+    expect(ownerResponse.body.name).toBe("Original Monitor");
+  });
+
+  test("user cannot delete another user's monitor", async () => {
+    const owner = await signupUser({
+      username: "deleteOwner",
+      email: "deleteowner@example.com"
+    });
+
+    const otherUser = await signupUser({
+      username: "deleteOther",
+      email: "deleteother@example.com"
+    });
+
+    const createResponse = await request(app)
+      .post("/api/monitors")
+      .set("Authorization", `Bearer ${owner.body.accessToken}`)
+      .send({
+        name: "Protected Monitor",
+        url: "https://example.com"
+      });
+
+    const monitorId = createResponse.body._id;
+
+    const response = await request(app)
+      .delete(`/api/monitors/${monitorId}`)
+      .set("Authorization", `Bearer ${otherUser.body.accessToken}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe("Monitor not found");
+
+    const ownerResponse = await request(app)
+      .get(`/api/monitors/${monitorId}`)
+      .set("Authorization", `Bearer ${owner.body.accessToken}`);
+
+    expect(ownerResponse.status).toBe(200);
+    expect(ownerResponse.body._id).toBe(monitorId);
+  });
+
   test("health endpoint returns 200", async () => {
     const response = await request(app)
       .get("/api/health");
