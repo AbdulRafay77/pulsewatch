@@ -24,7 +24,9 @@ async function createMonitor(req, res) {
 
     res.status(201).json(monitor);
   } catch (error) {
-    console.error("Create monitor error:", error);
+    if (!error.statusCode || error.statusCode >= 500) {
+      console.error("Create monitor error:", error);
+    }
 
     res.status(error.statusCode || 500).json({
       message: error.statusCode
@@ -36,15 +38,15 @@ async function createMonitor(req, res) {
 
 async function getMonitors(req, res) {
   try {
-    console.log("Logged-in user ID:", req.user._id);
-
     const monitors = await monitorService.getMonitors(
       req.user._id
     );
 
     res.status(200).json(monitors);
   } catch (error) {
-    console.error("Get monitors error:", error);
+    if (!error.statusCode || error.statusCode >= 500) {
+      console.error("Get monitors error:", error);
+    }
 
     res.status(500).json({
       message: "Failed to fetch monitors"
@@ -61,7 +63,9 @@ async function getMonitorById(req, res) {
 
     res.status(200).json(monitor);
   } catch (error) {
-    console.error("Get monitor error:", error);
+    if (!error.statusCode || error.statusCode >= 500) {
+      console.error("Get monitor error:", error);
+    }
 
     res.status(error.statusCode || 500).json({
       message: error.statusCode
@@ -97,7 +101,9 @@ async function updateMonitor(req, res) {
 
     res.status(200).json(monitor);
   } catch (error) {
-    console.error("Update monitor error:", error);
+    if (!error.statusCode || error.statusCode >= 500) {
+      console.error("Update monitor error:", error);
+    }
 
     res.status(error.statusCode || 500).json({
       message: error.statusCode
@@ -119,7 +125,9 @@ async function deleteMonitor(req, res) {
       monitorId: monitor._id
     });
   } catch (error) {
-    console.error("Delete monitor error:", error);
+    if (!error.statusCode || error.statusCode >= 500) {
+      console.error("Delete monitor error:", error);
+    }
 
     res.status(error.statusCode || 500).json({
       message: error.statusCode

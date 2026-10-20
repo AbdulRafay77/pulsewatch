@@ -70,10 +70,9 @@ async function signup(req, res) {
       accessToken
     });
   } catch (error) {
-    console.error(
-      "Signup error:",
-      error
-    );
+    if (!error.statusCode || error.statusCode >= 500) {
+      console.error("Signup error:", error);
+    }
 
     res
       .status(error.statusCode || 500)
@@ -109,10 +108,9 @@ async function login(req, res) {
       accessToken
     });
   } catch (error) {
-    console.error(
-      "Login error:",
-      error
-    );
+    if (!error.statusCode || error.statusCode >= 500) {
+      console.error("Login error:", error);
+    }
 
     res
       .status(error.statusCode || 500)
@@ -156,10 +154,9 @@ async function refresh(req, res) {
       accessToken
     });
   } catch (error) {
-    console.error(
-      "Refresh error:",
-      error
-    );
+    if (!error.statusCode || error.statusCode >= 500) {
+      console.error("Refresh error:", error);
+    }
 
     res
       .status(error.statusCode || 500)
@@ -175,8 +172,6 @@ async function logout(req, res) {
   try {
     const refreshToken = req.cookies.refreshToken;
 
-    console.log("LOGOUT cookie exists:", Boolean(refreshToken));
-
     if (refreshToken) {
       await refreshSessionService.revokeSession(
         refreshToken
@@ -189,7 +184,9 @@ async function logout(req, res) {
       message: "Logged out successfully"
     });
   } catch (error) {
-    console.error("Logout error:", error);
+    if (!error.statusCode || error.statusCode >= 500) {
+      console.error("Logout error:", error);
+    }
 
     res.status(500).json({
       message: "Failed to logout"
