@@ -74,6 +74,80 @@ async function createTestMonitor() {
 }
 
 describe("Monitor check lifecycle", () => {
+  test("healthy monitor does not create an incident", async () => {
+    const monitor = await createTestMonitor();
+
+    checkWithRetries.mockResolvedValue({
+      success: true,
+      statusCode: 200,
+      responseTime: 80,
+      errorMessage: null
+    });
+
+    const result = await checkService.runMonitorCheck(monitor._id);
+
+    expect(result.monitor.status).toBe("up");
+    expect(result.check.success).toBe(true);
+
+    const checks = await Check.find({
+      monitorId: monitor._id
+    });
+
+    expect(checks).toHaveLength(1);
+
+    const incidents = await Incident.find({
+      monitorId: monitor._id
+    });
+
+    expect(incidents).toHaveLength(0);
+
+    const notifications = await Notification.find({
+      monitorId: monitor._id
+    });
+
+    expect(notifications).toHaveLength(0);
+
+    expect(
+      alertEmailService.sendIncidentAlertEmail
+    ).not.toHaveBeenCalled();
+  });
+
+  test("does not check a paused monitor", async () => {
+    const monitor = await createTestMonitor();
+
+    monitor.isPaused = true;
+    await monitor.save();
+
+    await expect(
+      checkService.runMonitorCheck(monitor._id)
+    ).rejects.toMatchObject({
+      statusCode: 409,
+      message: "Monitor is paused"
+    });
+
+    const checks = await Check.find({
+      monitorId: monitor._id
+    });
+
+    expect(checks).toHaveLength(0);
+
+    expect(checkWithRetries).not.toHaveBeenCalled();
+  });
+
+  test("rejects checking a monitor that does not exist", async () => {
+    const missingMonitorId =
+      new mongoose.Types.ObjectId();
+
+    await expect(
+      checkService.runMonitorCheck(missingMonitorId)
+    ).rejects.toMatchObject({
+      statusCode: 404,
+      message: "Monitor not found"
+    });
+
+    expect(checkWithRetries).not.toHaveBeenCalled();
+  });
+
   test("creates an incident when a monitor goes down", async () => {
     const monitor = await createTestMonitor();
 
