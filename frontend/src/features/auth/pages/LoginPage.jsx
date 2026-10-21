@@ -1,15 +1,13 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import "./../auth.css";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] =
-    useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [submitting, setSubmitting] =
-    useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -21,7 +19,7 @@ function LoginPage() {
       setSubmitting(true);
       setError("");
 
-      await login(email, password);
+      await login(email.trim(), password);
 
       navigate("/dashboard");
     } catch (error) {
@@ -35,48 +33,69 @@ function LoginPage() {
   }
 
   return (
-    <div>
-      <h1>Login</h1>
-
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email</label>
-
-          <input
-            type="email"
-            value={email}
-            onChange={(event) =>
-              setEmail(event.target.value)
-            }
-            required
-          />
+    <main className="auth-page">
+      <div className="auth-container">
+        <div className="auth-heading">
+          <h1>Welcome back</h1>
+          <p>
+            Sign in to continue monitoring your websites and APIs.
+          </p>
         </div>
 
-        <div>
-          <label>Password</label>
+        <div className="auth-card">
+          <form onSubmit={handleSubmit}>
+            <div className="auth-form-group">
+              <label htmlFor="login-email">Email</label>
 
-          <input
-            type="password"
-            value={password}
-            onChange={(event) =>
-              setPassword(event.target.value)
-            }
-            required
-          />
+              <input
+                id="login-email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="you@example.com"
+                disabled={submitting}
+                autoComplete="email"
+                required
+              />
+            </div>
+
+            <div className="auth-form-group">
+              <label htmlFor="login-password">Password</label>
+
+              <input
+                id="login-password"
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="Enter your password"
+                disabled={submitting}
+                autoComplete="current-password"
+                required
+              />
+            </div>
+
+            {error && (
+              <p className="auth-error" role="alert">
+                {error}
+              </p>
+            )}
+
+            <button
+              className="auth-submit"
+              type="submit"
+              disabled={submitting}
+            >
+              {submitting ? "Logging in..." : "Log in"}
+            </button>
+          </form>
         </div>
 
-        {error && <p>{error}</p>}
-
-        <button
-          type="submit"
-          disabled={submitting}
-        >
-          {submitting
-            ? "Logging in..."
-            : "Login"}
-        </button>
-      </form>
-    </div>
+        <p className="auth-footer">
+          New to PulseWatch?{" "}
+          <Link to="/signup">Create an account</Link>
+        </p>
+      </div>
+    </main>
   );
 }
 
