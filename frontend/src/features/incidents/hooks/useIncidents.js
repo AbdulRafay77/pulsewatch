@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getIncidents } from "../api/incidentApi.js";
+import { getApiErrorMessage } from "../../../lib/getApiErrorMessage.js";
 
 function useIncidents() {
   const [incidents, setIncidents] = useState([]);
@@ -9,11 +10,19 @@ function useIncidents() {
   useEffect(() => {
     async function loadIncidents() {
       try {
+        setLoading(true);
+        setError("");
+
         const data = await getIncidents();
 
         setIncidents(data);
       } catch (error) {
-        setError("Failed to load incidents");
+        setError(
+          getApiErrorMessage(
+            error,
+            "Unable to load incidents"
+          )
+        );
       } finally {
         setLoading(false);
       }

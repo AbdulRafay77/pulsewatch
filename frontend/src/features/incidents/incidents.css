@@ -1,0 +1,271 @@
+.incidents-page {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 48px 0 72px;
+}
+
+.incidents-header {
+  margin-bottom: 36px;
+}
+
+.incidents-header h1 {
+  margin: 0 0 8px;
+
+  font-size: 40px;
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+
+.incidents-header p {
+  margin: 0;
+
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.incident-section {
+  margin-bottom: 40px;
+}
+
+.incident-section-heading {
+  margin-bottom: 16px;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.incident-section-heading h2 {
+  margin: 0 0 3px;
+
+  font-size: 22px;
+  letter-spacing: -0.3px;
+}
+
+.incident-section-heading p {
+  margin: 0;
+
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.incident-section-count {
+  min-width: 30px;
+  height: 30px;
+
+  padding: 0 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--text-secondary);
+  background: #efeeec;
+
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.incident-section-count-active {
+  color: #a32929;
+  background: #fff0f0;
+}
+
+.incident-list {
+  display: grid;
+  gap: 14px;
+}
+
+.incident-card {
+  padding: 22px 24px;
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+
+  box-shadow: var(--shadow-soft);
+}
+
+.incident-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+
+  margin-bottom: 18px;
+}
+
+.incident-card-header h3 {
+  margin: 0 0 4px;
+
+  font-size: 18px;
+  letter-spacing: -0.2px;
+}
+
+.incident-url {
+  display: block;
+
+  max-width: 700px;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  color: var(--text-muted);
+
+  font-size: 13px;
+}
+
+.incident-url:hover {
+  color: var(--primary);
+}
+
+.incident-badge {
+  padding: 4px 9px;
+
+  flex-shrink: 0;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+}
+
+.incident-badge-active {
+  color: #a32929;
+  background: #fff0f0;
+}
+
+.incident-badge-resolved {
+  color: #16752a;
+  background: #eaf7ed;
+}
+
+.incident-reason-box {
+  margin-bottom: 18px;
+  padding: 13px 14px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  background: var(--surface-soft);
+
+  border-radius: var(--radius-md);
+}
+
+.incident-reason-box strong {
+  color: var(--text-secondary);
+
+  font-size: 14px;
+}
+
+.incident-detail-label {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: var(--text-muted);
+
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.incident-details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.incident-details > div {
+  padding: 14px 16px;
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+}
+
+.incident-details > div + div {
+  border-left: 1px solid var(--border);
+}
+
+.incident-card-footer {
+  padding-top: 16px;
+
+  text-align: right;
+}
+
+.incident-card-footer a {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.incident-empty {
+  padding: 34px;
+
+  text-align: center;
+
+  background: var(--surface);
+
+  border: 1px dashed #d6d3d1;
+  border-radius: var(--radius-lg);
+}
+
+.incident-empty strong {
+  display: block;
+
+  margin-bottom: 5px;
+
+  font-size: 15px;
+}
+
+.incident-empty p {
+  margin: 0;
+
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.incident-empty-healthy {
+  border-color: #cfe8d5;
+  background: #fbfefb;
+}
+
+@media (max-width: 700px) {
+  .incidents-page {
+    width: calc(100% - 24px);
+    padding: 28px 0 48px;
+  }
+
+  .incidents-header h1 {
+    font-size: 32px;
+  }
+
+  .incident-card {
+    padding: 18px;
+  }
+
+  .incident-details {
+    grid-template-columns: 1fr;
+  }
+
+  .incident-details > div + div {
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .incident-card-header {
+    flex-direction: column;
+  }
+
+  .incident-section-heading {
+    align-items: center;
+  }
+}

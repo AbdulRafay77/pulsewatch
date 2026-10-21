@@ -1,57 +1,113 @@
+import { Link } from "react-router-dom";
+
 function IncidentCard({ incident }) {
   function formatDuration(durationMs) {
-    if (durationMs === null) {
+    if (durationMs === null || durationMs === undefined) {
       return "Ongoing";
     }
 
     const totalSeconds = Math.floor(durationMs / 1000);
-
-    const minutes = Math.floor(totalSeconds / 60);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
 
-    if (minutes === 0) {
-      return `${seconds} seconds`;
+    if (hours > 0) {
+      return `${hours} hr ${minutes} min`;
     }
 
-    return `${minutes} min ${seconds} sec`;
+    if (minutes > 0) {
+      return `${minutes} min ${seconds} sec`;
+    }
+
+    return `${seconds} sec`;
   }
 
+  const isActive = incident.status === "active";
+  const monitor = incident.monitorId;
+
   return (
-    <div>
-      <h2>{incident.monitorId?.name || "Unknown Monitor"}</h2>
+    <article className="incident-card">
+      <div className="incident-card-header">
+        <div>
+          <h3>{monitor?.name || "Unknown Monitor"}</h3>
 
-      <p>
-        URL: {incident.monitorId?.url || "Unknown"}
-      </p>
+          {monitor?.url && (
+            <a
+              className="incident-url"
+              href={monitor.url}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {monitor.url}
+            </a>
+          )}
+        </div>
 
-      <p>
-        Incident Status: {incident.status}
-      </p>
+        <span
+          className={
+            isActive
+              ? "incident-badge incident-badge-active"
+              : "incident-badge incident-badge-resolved"
+          }
+        >
+          {isActive ? "ACTIVE" : "RESOLVED"}
+        </span>
+      </div>
 
-      <p>
-        Monitor Status: {incident.monitorId?.status}
-      </p>
+      <div className="incident-reason-box">
+        <span className="incident-detail-label">
+          Reason
+        </span>
 
-      <p>
-        Reason: {incident.reason}
-      </p>
+        <strong>{incident.reason}</strong>
+      </div>
 
-      <p>
-        Started:{" "}
-        {new Date(incident.startedAt).toLocaleString()}
-      </p>
+      <div className="incident-details">
+        <div>
+          <span className="incident-detail-label">
+            Started
+          </span>
 
-      <p>
-        Resolved:{" "}
-        {incident.resolvedAt
-          ? new Date(incident.resolvedAt).toLocaleString()
-          : "Not resolved"}
-      </p>
+          <span>
+            {new Date(
+              incident.startedAt
+            ).toLocaleString()}
+          </span>
+        </div>
 
-      <p>
-        Duration: {formatDuration(incident.durationMs)}
-      </p>
-    </div>
+        <div>
+          <span className="incident-detail-label">
+            Resolved
+          </span>
+
+          <span>
+            {incident.resolvedAt
+              ? new Date(
+                  incident.resolvedAt
+                ).toLocaleString()
+              : "Not resolved"}
+          </span>
+        </div>
+
+        <div>
+          <span className="incident-detail-label">
+            Duration
+          </span>
+
+          <span>
+            {formatDuration(incident.durationMs)}
+          </span>
+        </div>
+      </div>
+
+      {monitor?._id && (
+        <div className="incident-card-footer">
+          <Link to={`/monitors/${monitor._id}`}>
+            View monitor →
+          </Link>
+        </div>
+      )}
+    </article>
   );
 }
 
