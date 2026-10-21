@@ -32,10 +32,10 @@ function CreateMonitorForm({ onCreate }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="monitor-form card" onSubmit={handleSubmit}>
       <h2>Create Monitor</h2>
 
-      <div>
+      <div className="form-group">
         <label htmlFor="name">Monitor Name</label>
 
         <input
@@ -49,7 +49,7 @@ function CreateMonitorForm({ onCreate }) {
         />
       </div>
 
-      <div>
+      <div className="form-group">
         <label htmlFor="url">URL</label>
 
         <input
@@ -63,7 +63,7 @@ function CreateMonitorForm({ onCreate }) {
         />
       </div>
 
-      <div>
+      <div className="form-group">
         <label htmlFor="interval">
           Check Interval (minutes)
         </label>
@@ -81,7 +81,7 @@ function CreateMonitorForm({ onCreate }) {
         />
       </div>
 
-      <div>
+      <div className="form-group">
         <label htmlFor="timeout">
           Timeout (milliseconds)
         </label>
@@ -99,7 +99,9 @@ function CreateMonitorForm({ onCreate }) {
         />
       </div>
 
-      <button type="submit" disabled={submitting}>
+      <button 
+        className="btn btn-primary btn-full"
+        type="submit" disabled={submitting}>
         {submitting ? "Creating..." : "Create Monitor"}
       </button>
     </form>

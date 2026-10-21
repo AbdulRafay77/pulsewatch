@@ -29,10 +29,10 @@ function EditMonitorForm({ monitor, onSave, onCancel }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="edit-monitor-form" onSubmit={handleSubmit}>
       <h3>Edit Monitor</h3>
 
-      <div>
+      <div className="form-group">
         <label htmlFor={`name-${monitor._id}`}>Name</label>
 
         <input
@@ -45,7 +45,7 @@ function EditMonitorForm({ monitor, onSave, onCancel }) {
         />
       </div>
 
-      <div>
+      <div className="form-group">
         <label htmlFor={`url-${monitor._id}`}>URL</label>
 
         <input
@@ -58,7 +58,7 @@ function EditMonitorForm({ monitor, onSave, onCancel }) {
         />
       </div>
 
-      <div>
+      <div className="form-group">
         <label htmlFor={`interval-${monitor._id}`}>
           Interval (minutes)
         </label>
@@ -74,7 +74,7 @@ function EditMonitorForm({ monitor, onSave, onCancel }) {
         />
       </div>
 
-      <div>
+      <div className="form-group">
         <label htmlFor={`timeout-${monitor._id}`}>
           Timeout (ms)
         </label>
@@ -90,13 +90,24 @@ function EditMonitorForm({ monitor, onSave, onCancel }) {
         />
       </div>
 
-      <button type="submit" disabled={saving}>
-        {saving ? "Saving..." : "Save Changes"}
-      </button>
+      <div className="edit-form-actions">
+        <button
+          className="btn btn-primary"
+          type="submit"
+          disabled={saving}
+        >
+          {saving ? "Saving..." : "Save Changes"}
+        </button>
 
-      <button type="button" onClick={onCancel} disabled={saving}>
-        Cancel
-      </button>
+        <button
+          className="btn btn-secondary"
+          type="button"
+          onClick={onCancel}
+          disabled={saving}
+        >
+          Cancel
+        </button>
+      </div>
     </form>
   );
 }

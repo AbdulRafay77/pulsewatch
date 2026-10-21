@@ -61,76 +61,117 @@ function MonitorCard({
     }
   }
 
+  const displayedStatus = monitor.isPaused
+    ? "PAUSED"
+    : monitor.status.toUpperCase();
+
+  const statusClass = monitor.isPaused
+    ? "status-paused"
+    : `status-${monitor.status}`;
+
   return (
-    <article>
-      <h2>{monitor.name}</h2>
+    <article className="monitor-card card">
+      <div className="monitor-card-header">
+        <div>
+          <h2>{monitor.name}</h2>
 
-      <p>
-        URL:{" "}
-        <a href={monitor.url} target="_blank" rel="noreferrer">
-          {monitor.url}
-        </a>
-      </p>
+          <a
+            className="monitor-url"
+            href={monitor.url}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {monitor.url}
+          </a>
+        </div>
 
-      <p>
-        Status:{" "}
-        <strong>
-          {monitor.isPaused
-            ? "PAUSED"
-            : monitor.status.toUpperCase()}
-        </strong>
-      </p>
+        <span className={`status-badge ${statusClass}`}>
+          {displayedStatus}
+        </span>
+      </div>
 
-      <p>Check every: {monitor.intervalMinutes} minutes</p>
+      <div className="monitor-meta">
+        <div className="monitor-meta-item">
+          <span className="monitor-meta-label">
+            Check Interval
+          </span>
 
-      <p>Timeout: {monitor.timeoutMs} ms</p>
+          <span className="monitor-meta-value">
+            {monitor.intervalMinutes} min
+          </span>
+        </div>
 
-      <p>
-        Last checked:{" "}
-        {monitor.lastCheckedAt
-          ? new Date(monitor.lastCheckedAt).toLocaleString()
-          : "Never"}
-      </p>
+        <div className="monitor-meta-item">
+          <span className="monitor-meta-label">
+            Timeout
+          </span>
 
-      <button
-        type="button"
-        onClick={handleCheck}
-        disabled={isBusy || monitor.isPaused || editing}
-      >
-        {checking ? "Checking..." : "Check Now"}
-      </button>
+          <span className="monitor-meta-value">
+            {monitor.timeoutMs} ms
+          </span>
+        </div>
 
-      <button
-        type="button"
-        onClick={handleTogglePause}
-        disabled={isBusy || editing}
-      >
-        {updatingPause
-          ? "Updating..."
-          : monitor.isPaused
-            ? "Resume"
-            : "Pause"}
-      </button>
+        <div className="monitor-meta-item">
+          <span className="monitor-meta-label">
+            Last Checked
+          </span>
 
-      <button
-        type="button"
-        onClick={() => setEditing(true)}
-        disabled={isBusy || editing}
-      >
-        Edit
-      </button>
+          <span className="monitor-meta-value">
+            {monitor.lastCheckedAt
+              ? new Date(monitor.lastCheckedAt).toLocaleString()
+              : "Never"}
+          </span>
+        </div>
+      </div>
 
-      <button
-        type="button"
-        onClick={handleDelete}
-        disabled={isBusy || editing}
-      >
-        {deleting ? "Deleting..." : "Delete"}
-      </button>
+      <div className="monitor-actions">
+        <button
+          className="btn btn-primary"
+          type="button"
+          onClick={handleCheck}
+          disabled={isBusy || monitor.isPaused || editing}
+        >
+          {checking ? "Checking..." : "Check Now"}
+        </button>
 
-      <Link to={`/monitors/${monitor._id}`}>
-        View Details
-      </Link>
+        <button
+          className="btn btn-secondary"
+          type="button"
+          onClick={handleTogglePause}
+          disabled={isBusy || editing}
+        >
+          {updatingPause
+            ? "Updating..."
+            : monitor.isPaused
+              ? "Resume"
+              : "Pause"}
+        </button>
+
+        <button
+          className="btn btn-secondary"
+          type="button"
+          onClick={() => setEditing(true)}
+          disabled={isBusy || editing}
+        >
+          Edit
+        </button>
+
+        <button
+          className="btn btn-danger"
+          type="button"
+          onClick={handleDelete}
+          disabled={isBusy || editing}
+        >
+          {deleting ? "Deleting..." : "Delete"}
+        </button>
+
+        <Link
+          className="monitor-details-link"
+          to={`/monitors/${monitor._id}`}
+        >
+          View Details →
+        </Link>
+      </div>
 
       {editing && (
         <EditMonitorForm
