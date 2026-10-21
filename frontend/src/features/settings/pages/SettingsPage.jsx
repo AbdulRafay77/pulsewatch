@@ -1,33 +1,98 @@
 import { usePreferences } from "../hooks/usePreferences.js";
+import "../settings.css";
 
 function SettingsPage() {
-  const { emailAlertsEnabled, loading, saving, error, toggleEmailAlerts } = usePreferences();
+  const {
+    emailAlertsEnabled,
+    loading,
+    saving,
+    error,
+    toggleEmailAlerts
+  } = usePreferences();
 
   if (loading) {
-    return <p>Loading settings...</p>;
+    return (
+      <main className="settings-page">
+        <p>Loading settings...</p>
+      </main>
+    );
   }
 
   return (
-    <div>
-      <h1>Settings</h1>
+    <main className="settings-page">
+      <header className="settings-header">
+        <h1>Settings</h1>
 
-      <section>
-        <h2>Notifications</h2>
+        <p>
+          Manage how PulseWatch communicates with you.
+        </p>
+      </header>
 
-        <div>
-          <div>
-            <strong>Email alerts</strong>
-            <p>Receive an email when a monitor goes down or recovers.</p>
-          </div>
+      {error && (
+        <p className="error-message" role="alert">
+          {error}
+        </p>
+      )}
 
-          <button type="button" onClick={toggleEmailAlerts} disabled={saving}>
-            {saving ? "Saving..." : emailAlertsEnabled ? "Enabled" : "Disabled"}
-          </button>
+      <section className="settings-section">
+        <div className="settings-section-heading">
+          <h2>Notifications</h2>
+
+          <p>
+            Choose how you want to receive monitoring alerts.
+          </p>
         </div>
 
-        {error && <p>{error}</p>}
+        <div className="settings-card">
+          <div className="settings-option">
+            <div className="settings-option-content">
+              <div className="settings-option-heading">
+                <h3>Email incident alerts</h3>
+
+                <span
+                  className={
+                    emailAlertsEnabled
+                      ? "settings-status settings-status-enabled"
+                      : "settings-status settings-status-disabled"
+                  }
+                >
+                  {emailAlertsEnabled
+                    ? "Enabled"
+                    : "Disabled"}
+                </span>
+              </div>
+
+              <p>
+                Receive an email when a monitor goes down
+                or recovers.
+              </p>
+            </div>
+
+            <button
+              className={
+                emailAlertsEnabled
+                  ? "settings-toggle settings-toggle-on"
+                  : "settings-toggle"
+              }
+              type="button"
+              role="switch"
+              aria-checked={emailAlertsEnabled}
+              aria-label="Email incident alerts"
+              disabled={saving}
+              onClick={toggleEmailAlerts}
+            >
+              <span className="settings-toggle-thumb" />
+            </button>
+          </div>
+
+          {saving && (
+            <p className="settings-saving">
+              Saving preference...
+            </p>
+          )}
+        </div>
       </section>
-    </div>
+    </main>
   );
 }
 
