@@ -3,6 +3,7 @@ import {
   getMonitorById,
   getMonitorChecks
 } from "../api/monitorApi.js";
+import { getApiErrorMessage } from "../../../lib/getApiErrorMessage.js";
 
 function useMonitorDetails(monitorId) {
   const [monitor, setMonitor] = useState(null);
@@ -13,6 +14,7 @@ function useMonitorDetails(monitorId) {
   useEffect(() => {
     async function loadMonitorDetails() {
       try {
+        setLoading(true);
         setError("");
 
         const [monitorData, checksData] =
@@ -24,7 +26,12 @@ function useMonitorDetails(monitorId) {
         setMonitor(monitorData);
         setChecks(checksData);
       } catch (error) {
-        setError("Failed to load monitor details");
+        setError(
+          getApiErrorMessage(
+            error,
+            "Failed to load monitor details"
+          )
+        );
       } finally {
         setLoading(false);
       }

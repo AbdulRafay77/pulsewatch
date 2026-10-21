@@ -6,6 +6,7 @@ import {
   updateMonitor,
   deleteMonitor
 } from "../api/monitorApi.js";
+import { getApiErrorMessage } from "../../../lib/getApiErrorMessage.js";
 
 function useMonitors() {
   const [monitors, setMonitors] = useState([]);
@@ -15,11 +16,16 @@ function useMonitors() {
   useEffect(() => {
     async function loadMonitors() {
       try {
+        setError("");
         const data = await getMonitors();
-
         setMonitors(data);
       } catch (error) {
-        setError("Failed to load monitors");
+        setError(
+          getApiErrorMessage(
+            error,
+            "Failed to load monitors"
+          )
+        );
       } finally {
         setLoading(false);
       }
@@ -41,7 +47,13 @@ function useMonitors() {
 
       return newMonitor;
     } catch (error) {
-      setError("Failed to create monitor");
+      setError(
+        getApiErrorMessage(
+          error,
+          "Failed to create monitor"
+        )
+      );
+
       throw error;
     }
   }
@@ -62,7 +74,13 @@ function useMonitors() {
 
       return result;
     } catch (error) {
-      setError("Failed to check monitor");
+      setError(
+        getApiErrorMessage(
+          error,
+          "Failed to check monitor"
+        )
+      );
+
       throw error;
     }
   }
@@ -88,7 +106,13 @@ function useMonitors() {
 
       return updatedMonitor;
     } catch (error) {
-      setError("Failed to update monitor");
+      setError(
+        getApiErrorMessage(
+          error,
+          "Failed to update monitor"
+        )
+      );
+
       throw error;
     }
   }
@@ -112,7 +136,13 @@ function useMonitors() {
 
       return updatedMonitor;
     } catch (error) {
-      setError("Failed to edit monitor");
+      setError(
+        getApiErrorMessage(
+          error,
+          "Failed to edit monitor"
+        )
+      );
+
       throw error;
     }
   }
@@ -129,7 +159,13 @@ function useMonitors() {
         )
       );
     } catch (error) {
-      setError("Failed to delete monitor");
+      setError(
+        getApiErrorMessage(
+          error,
+          "Failed to delete monitor"
+        )
+      );
+
       throw error;
     }
   }
