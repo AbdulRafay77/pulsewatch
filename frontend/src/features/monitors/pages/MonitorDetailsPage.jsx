@@ -19,18 +19,23 @@ function MonitorDetailsPage() {
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return <p role="alert">{error}</p>;
   }
 
   if (!monitor) {
-    return <p>Monitor not found.</p>;
+    return <p>This monitor could not be found.</p>;
   }
 
   return (
     <div>
       <h1>{monitor.name}</h1>
 
-      <p>URL: {monitor.url}</p>
+      <p>
+        URL:{" "}
+        <a href={monitor.url} target="_blank" rel="noreferrer">
+          {monitor.url}
+        </a>
+      </p>
       <p>Status: {monitor.status}</p>
 
       <p>

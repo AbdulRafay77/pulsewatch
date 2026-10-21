@@ -24,7 +24,7 @@ function MonitorsPage() {
 
       <CreateMonitorForm onCreate={addMonitor} />
 
-      {error && <p>{error}</p>}
+      {error && <p role="alert">{error}</p>}
 
       {monitors.length === 0 ? (
         <p>No monitors yet.</p>
