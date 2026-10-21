@@ -21,11 +21,16 @@ function ResponseTimeChart({ checks }) {
     }));
 
   if (chartData.length === 0) {
-    return <p>No response-time data yet.</p>;
+    return (
+      <section>
+        <h2>Response Time</h2>
+        <p>No response-time data yet.</p>
+      </section>
+    );
   }
 
   return (
-    <div>
+    <section>
       <h2>Response Time</h2>
 
       <div style={{ width: "100%", height: 300 }}>
@@ -43,7 +48,9 @@ function ResponseTimeChart({ checks }) {
               }}
             />
 
-            <Tooltip />
+            <Tooltip
+              formatter={(value) => [`${value} ms`, "Response Time"]}
+            />
 
             <Line
               type="monotone"
@@ -54,7 +61,7 @@ function ResponseTimeChart({ checks }) {
           </LineChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </section>
   );
 }
 

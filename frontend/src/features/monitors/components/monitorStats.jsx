@@ -1,13 +1,11 @@
 function MonitorStats({ checks }) {
   const totalChecks = checks.length;
 
-  const successfulChecks = checks.filter(
-    (check) => check.success
-  ).length;
+  const successfulChecks = checks.filter((check) => check.success).length;
 
   const uptime =
     totalChecks === 0
-      ? 0
+      ? null
       : (successfulChecks / totalChecks) * 100;
 
   const totalResponseTime = checks.reduce(
@@ -17,27 +15,41 @@ function MonitorStats({ checks }) {
 
   const averageResponseTime =
     totalChecks === 0
-      ? 0
+      ? null
       : Math.round(totalResponseTime / totalChecks);
 
   return (
-    <div>
-      <h2>Monitor Statistics</h2>
+    <section>
+      <h2>Recent Statistics</h2>
 
-      <p>Total Checks: {totalChecks}</p>
+      <div>
+        <div>
+          <strong>{totalChecks}</strong>
+          <p>Total Checks</p>
+        </div>
 
-      <p>
-        Successful Checks: {successfulChecks}
-      </p>
+        <div>
+          <strong>{successfulChecks}</strong>
+          <p>Successful Checks</p>
+        </div>
 
-      <p>
-        Recent Uptime: {uptime.toFixed(2)}%
-      </p>
+        <div>
+          <strong>
+            {uptime === null ? "N/A" : `${uptime.toFixed(2)}%`}
+          </strong>
+          <p>Recent Uptime</p>
+        </div>
 
-      <p>
-        Average Response Time: {averageResponseTime} ms
-      </p>
-    </div>
+        <div>
+          <strong>
+            {averageResponseTime === null
+              ? "N/A"
+              : `${averageResponseTime} ms`}
+          </strong>
+          <p>Average Response Time</p>
+        </div>
+      </div>
+    </section>
   );
 }
 
