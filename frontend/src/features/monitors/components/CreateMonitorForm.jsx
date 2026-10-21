@@ -14,8 +14,8 @@ function CreateMonitorForm({ onCreate }) {
       setSubmitting(true);
 
       await onCreate({
-        name,
-        url,
+        name: name.trim(),
+        url: url.trim(),
         intervalMinutes: Number(intervalMinutes),
         timeoutMs: Number(timeoutMs)
       });
@@ -24,6 +24,8 @@ function CreateMonitorForm({ onCreate }) {
       setUrl("");
       setIntervalMinutes(5);
       setTimeoutMs(5000);
+    } catch (error) {
+      // Visible error is handled by useMonitors.
     } finally {
       setSubmitting(false);
     }
@@ -42,6 +44,7 @@ function CreateMonitorForm({ onCreate }) {
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Payment API"
+          disabled={submitting}
           required
         />
       </div>
@@ -55,6 +58,7 @@ function CreateMonitorForm({ onCreate }) {
           value={url}
           onChange={(event) => setUrl(event.target.value)}
           placeholder="https://example.com/health"
+          disabled={submitting}
           required
         />
       </div>
@@ -72,6 +76,7 @@ function CreateMonitorForm({ onCreate }) {
           onChange={(event) =>
             setIntervalMinutes(event.target.value)
           }
+          disabled={submitting}
           required
         />
       </div>
@@ -89,6 +94,7 @@ function CreateMonitorForm({ onCreate }) {
           onChange={(event) =>
             setTimeoutMs(event.target.value)
           }
+          disabled={submitting}
           required
         />
       </div>

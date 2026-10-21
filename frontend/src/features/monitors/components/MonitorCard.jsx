@@ -11,15 +11,17 @@ function MonitorCard({
 }) {
   const [checking, setChecking] = useState(false);
   const [updatingPause, setUpdatingPause] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [editing, setEditing] = useState(false);
+
+  const isBusy = checking || updatingPause || deleting;
 
   async function handleCheck() {
     try {
       setChecking(true);
-
       await onCheck(monitor._id);
     } catch (error) {
-      // useMonitors already handles the visible error
+      // Visible error is handled by useMonitors.
     } finally {
       setChecking(false);
     }
@@ -34,7 +36,7 @@ function MonitorCard({
         monitor.isPaused
       );
     } catch (error) {
-      // visible error handled by useMonitors
+      // Visible error is handled by useMonitors.
     } finally {
       setUpdatingPause(false);
     }
@@ -50,31 +52,38 @@ function MonitorCard({
     }
 
     try {
+      setDeleting(true);
       await onDelete(monitor._id);
     } catch (error) {
-      // visible error handled by useMonitors
+      // Visible error is handled by useMonitors.
+    } finally {
+      setDeleting(false);
     }
   }
 
   return (
-    <div>
+    <article>
       <h2>{monitor.name}</h2>
 
-      <p>{monitor.url}</p>
-
-      <p>Status: {monitor.status}</p>
-
       <p>
-        Check every: {monitor.intervalMinutes} minutes
+        URL:{" "}
+        <a href={monitor.url} target="_blank" rel="noreferrer">
+          {monitor.url}
+        </a>
       </p>
 
       <p>
-        Timeout: {monitor.timeoutMs} ms
+        Status:{" "}
+        <strong>
+          {monitor.isPaused
+            ? "PAUSED"
+            : monitor.status.toUpperCase()}
+        </strong>
       </p>
 
-      <p>
-        {monitor.isPaused ? "Paused" : "Active"}
-      </p>
+      <p>Check every: {monitor.intervalMinutes} minutes</p>
+
+      <p>Timeout: {monitor.timeoutMs} ms</p>
 
       <p>
         Last checked:{" "}
@@ -84,15 +93,17 @@ function MonitorCard({
       </p>
 
       <button
+        type="button"
         onClick={handleCheck}
-        disabled={checking || monitor.isPaused}
+        disabled={isBusy || monitor.isPaused || editing}
       >
         {checking ? "Checking..." : "Check Now"}
       </button>
 
-      <button 
+      <button
+        type="button"
         onClick={handleTogglePause}
-        disabled={updatingPause}
+        disabled={isBusy || editing}
       >
         {updatingPause
           ? "Updating..."
@@ -101,12 +112,20 @@ function MonitorCard({
             : "Pause"}
       </button>
 
-      <button onClick={() => setEditing(true)}>
+      <button
+        type="button"
+        onClick={() => setEditing(true)}
+        disabled={isBusy || editing}
+      >
         Edit
       </button>
 
-      <button onClick={handleDelete}>
-        Delete
+      <button
+        type="button"
+        onClick={handleDelete}
+        disabled={isBusy || editing}
+      >
+        {deleting ? "Deleting..." : "Delete"}
       </button>
 
       <Link to={`/monitors/${monitor._id}`}>
@@ -123,7 +142,7 @@ function MonitorCard({
           onCancel={() => setEditing(false)}
         />
       )}
-    </div>
+    </article>
   );
 }
 
