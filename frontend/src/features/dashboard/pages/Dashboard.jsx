@@ -2,7 +2,7 @@ import useDashboard from "../hooks/useDashboard.js";
 import StatCard from "../components/StatCard.jsx";
 import MonitorOverview from "../components/MonitorOverview.jsx";
 import ActiveIncidents from "../components/ActiveIncidents.jsx";
-import NotificationTest from "../../notifications/components/NotificationTest.jsx";
+import "../dashboard.css";
 
 function Dashboard() {
   const {
@@ -13,11 +13,21 @@ function Dashboard() {
   } = useDashboard();
 
   if (loading) {
-    return <p>Loading dashboard...</p>;
+    return (
+      <main className="dashboard-page">
+        <p>Loading dashboard...</p>
+      </main>
+    );
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return (
+      <main className="dashboard-page">
+        <p className="error-message" role="alert">
+          {error}
+        </p>
+      </main>
+    );
   }
 
   const totalMonitors = monitors.length;
@@ -53,10 +63,9 @@ function Dashboard() {
     (monitor) => monitor.status !== "unknown"
   );
 
-  const healthyActiveMonitors =
-    checkedActiveMonitors.filter(
-      (monitor) => monitor.status === "up"
-    ).length;
+  const healthyActiveMonitors = checkedActiveMonitors.filter(
+    (monitor) => monitor.status === "up"
+  ).length;
 
   const healthPercentage =
     checkedActiveMonitors.length === 0
@@ -67,15 +76,57 @@ function Dashboard() {
           100
         ).toFixed(1);
 
+  let healthText = "Waiting for monitor data";
+  let healthTone = "warning";
+
+  if (checkedActiveMonitors.length > 0 && downMonitors === 0) {
+    healthText = "All monitored services are healthy";
+    healthTone = "healthy";
+  }
+
+  if (downMonitors > 0) {
+    healthText = `${downMonitors} ${
+      downMonitors === 1 ? "service needs" : "services need"
+    } attention`;
+
+    healthTone = "danger";
+  }
+
   return (
-    <div>
-      <h1>PulseWatch Dashboard</h1>
+    <main className="dashboard-page">
+      <header className="dashboard-header">
+        <h1>Dashboard</h1>
 
-      <p>
-        Current overview of your monitored services.
-      </p>
+        <p>
+          Current health and activity across your monitored services.
+        </p>
+      </header>
 
-      <div>
+      <section className="health-summary">
+        <div className="health-summary-main">
+          <span
+            className={`health-indicator health-indicator-${healthTone}`}
+          />
+
+          <div>
+            <h2>{healthText}</h2>
+
+            <p>
+              {activeMonitors.length} active ·{" "}
+              {pausedMonitors} paused ·{" "}
+              {unknownMonitors} unknown
+            </p>
+          </div>
+        </div>
+
+        <div className="health-percentage">
+          {checkedActiveMonitors.length === 0
+            ? "N/A"
+            : `${healthPercentage}%`}
+        </div>
+      </section>
+
+      <section className="dashboard-stats">
         <StatCard
           title="Total Monitors"
           value={totalMonitors}
@@ -84,38 +135,27 @@ function Dashboard() {
         <StatCard
           title="Up"
           value={upMonitors}
+          tone="up"
         />
 
         <StatCard
           title="Down"
           value={downMonitors}
-        />
-
-        <StatCard
-          title="Paused"
-          value={pausedMonitors}
-        />
-
-        <StatCard
-          title="Unknown"
-          value={unknownMonitors}
+          tone="down"
         />
 
         <StatCard
           title="Active Incidents"
           value={activeIncidents}
+          tone="incidents"
         />
+      </section>
 
-        <StatCard
-          title="Current Health"
-          value={`${healthPercentage}%`}
-        />
+      <div className="dashboard-content">
+        <MonitorOverview monitors={monitors.slice(0, 5)} />
+        <ActiveIncidents incidents={incidents} />
       </div>
-
-      <MonitorOverview monitors={monitors.slice(0, 5)} />
-
-      <ActiveIncidents incidents={incidents} />
-    </div>
+    </main>
   );
 }
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-
 import { getMonitors } from "../../monitors/api/monitorApi.js";
 import { getIncidents } from "../../incidents/api/incidentApi.js";
+import { getApiErrorMessage } from "../../../lib/getApiErrorMessage.js";
 
 function useDashboard() {
   const [monitors, setMonitors] = useState([]);
@@ -12,18 +12,23 @@ function useDashboard() {
   useEffect(() => {
     async function loadDashboard() {
       try {
+        setLoading(true);
         setError("");
 
-        const [monitorData, incidentData] =
-          await Promise.all([
-            getMonitors(),
-            getIncidents()
-          ]);
+        const [monitorData, incidentData] = await Promise.all([
+          getMonitors(),
+          getIncidents()
+        ]);
 
         setMonitors(monitorData);
         setIncidents(incidentData);
       } catch (error) {
-        setError("Failed to load dashboard");
+        setError(
+          getApiErrorMessage(
+            error,
+            "Unable to load dashboard data"
+          )
+        );
       } finally {
         setLoading(false);
       }

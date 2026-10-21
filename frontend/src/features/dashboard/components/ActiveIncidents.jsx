@@ -1,47 +1,46 @@
 import { Link } from "react-router-dom";
 
 function ActiveIncidents({ incidents }) {
-  const activeIncidents = incidents.filter(
-    (incident) => incident.status === "active"
-  );
-
-  if (activeIncidents.length === 0) {
-    return (
-      <div>
-        <h2>Active Incidents</h2>
-        <p>No active incidents.</p>
-      </div>
-    );
-  }
+  const activeIncidents = incidents
+    .filter((incident) => incident.status === "active")
+    .slice(0, 3);
 
   return (
-    <div>
-      <h2>Active Incidents</h2>
+    <section className="dashboard-panel">
+      <div className="dashboard-panel-header">
+        <h2>Active Incidents</h2>
 
-      {activeIncidents.map((incident) => (
-        <div key={incident._id}>
-          <h3>
-            {incident.monitorId?.name ||
-              "Unknown Monitor"}
-          </h3>
+        <Link
+          className="dashboard-panel-link"
+          to="/incidents"
+        >
+          View all incidents →
+        </Link>
+      </div>
 
-          <p>Reason: {incident.reason}</p>
-
-          <p>
-            Started:{" "}
-            {new Date(
-              incident.startedAt
-            ).toLocaleString()}
-          </p>
-
-          <hr />
+      {activeIncidents.length === 0 ? (
+        <div className="dashboard-empty">
+          No active incidents. Everything looks healthy.
         </div>
-      ))}
+      ) : (
+        activeIncidents.map((incident) => (
+          <div className="incident-row" key={incident._id}>
+            <h3>
+              {incident.monitorId?.name || "Unknown Monitor"}
+            </h3>
 
-      <Link to="/incidents">
-        View All Incidents
-      </Link>
-    </div>
+            <p className="incident-reason">
+              {incident.reason}
+            </p>
+
+            <span className="incident-meta">
+              Started{" "}
+              {new Date(incident.startedAt).toLocaleString()}
+            </span>
+          </div>
+        ))
+      )}
+    </section>
   );
 }
 

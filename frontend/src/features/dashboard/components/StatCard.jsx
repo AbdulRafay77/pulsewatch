@@ -1,8 +1,12 @@
-function StatCard({ title, value }) {
+function StatCard({ title, value, tone = "" }) {
+  const className = tone
+    ? `stat-card stat-card-${tone}`
+    : "stat-card";
+
   return (
-    <div>
+    <div className={className}>
       <h3>{title}</h3>
-      <p>{value}</p>
+      <p className="stat-card-value">{value}</p>
     </div>
   );
 }
