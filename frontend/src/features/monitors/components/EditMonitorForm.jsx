@@ -3,11 +3,10 @@ import { useState } from "react";
 function EditMonitorForm({ monitor, onSave, onCancel }) {
   const [name, setName] = useState(monitor.name);
   const [url, setUrl] = useState(monitor.url);
-  const [intervalMinutes, setIntervalMinutes] =
-    useState(monitor.intervalMinutes);
-  const [timeoutMs, setTimeoutMs] =
-    useState(monitor.timeoutMs);
-
+  const [intervalMinutes, setIntervalMinutes] = useState(
+    monitor.intervalMinutes
+  );
+  const [timeoutMs, setTimeoutMs] = useState(monitor.timeoutMs);
   const [saving, setSaving] = useState(false);
 
   async function handleSubmit(event) {
@@ -17,11 +16,13 @@ function EditMonitorForm({ monitor, onSave, onCancel }) {
       setSaving(true);
 
       await onSave(monitor._id, {
-        name,
-        url,
+        name: name.trim(),
+        url: url.trim(),
         intervalMinutes: Number(intervalMinutes),
         timeoutMs: Number(timeoutMs)
       });
+    } catch (error) {
+      // Visible error is handled by useMonitors.
     } finally {
       setSaving(false);
     }
@@ -32,55 +33,59 @@ function EditMonitorForm({ monitor, onSave, onCancel }) {
       <h3>Edit Monitor</h3>
 
       <div>
-        <label>Name</label>
+        <label htmlFor={`name-${monitor._id}`}>Name</label>
 
         <input
+          id={`name-${monitor._id}`}
           type="text"
           value={name}
-          onChange={(event) =>
-            setName(event.target.value)
-          }
+          onChange={(event) => setName(event.target.value)}
+          disabled={saving}
           required
         />
       </div>
 
       <div>
-        <label>URL</label>
+        <label htmlFor={`url-${monitor._id}`}>URL</label>
 
         <input
+          id={`url-${monitor._id}`}
           type="url"
           value={url}
-          onChange={(event) =>
-            setUrl(event.target.value)
-          }
+          onChange={(event) => setUrl(event.target.value)}
+          disabled={saving}
           required
         />
       </div>
 
       <div>
-        <label>Interval (minutes)</label>
+        <label htmlFor={`interval-${monitor._id}`}>
+          Interval (minutes)
+        </label>
 
         <input
+          id={`interval-${monitor._id}`}
           type="number"
           min="1"
           value={intervalMinutes}
-          onChange={(event) =>
-            setIntervalMinutes(event.target.value)
-          }
+          onChange={(event) => setIntervalMinutes(event.target.value)}
+          disabled={saving}
           required
         />
       </div>
 
       <div>
-        <label>Timeout (ms)</label>
+        <label htmlFor={`timeout-${monitor._id}`}>
+          Timeout (ms)
+        </label>
 
         <input
+          id={`timeout-${monitor._id}`}
           type="number"
           min="1000"
           value={timeoutMs}
-          onChange={(event) =>
-            setTimeoutMs(event.target.value)
-          }
+          onChange={(event) => setTimeoutMs(event.target.value)}
+          disabled={saving}
           required
         />
       </div>
@@ -89,11 +94,7 @@ function EditMonitorForm({ monitor, onSave, onCancel }) {
         {saving ? "Saving..." : "Save Changes"}
       </button>
 
-      <button
-        type="button"
-        onClick={onCancel}
-        disabled={saving}
-      >
+      <button type="button" onClick={onCancel} disabled={saving}>
         Cancel
       </button>
     </form>
