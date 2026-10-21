@@ -20,47 +20,68 @@ function ResponseTimeChart({ checks }) {
       responseTime: check.responseTime
     }));
 
-  if (chartData.length === 0) {
-    return (
-      <section>
-        <h2>Response Time</h2>
-        <p>No response-time data yet.</p>
-      </section>
-    );
-  }
-
   return (
-    <section>
+    <section className="response-chart-section">
       <h2>Response Time</h2>
 
-      <div style={{ width: "100%", height: 300 }}>
-        <ResponsiveContainer>
-          <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
+      {chartData.length === 0 ? (
+        <p className="chart-empty">
+          No response-time data yet.
+        </p>
+      ) : (
+        <div className="response-chart">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <CartesianGrid
+                stroke="#e6e6e6"
+                strokeDasharray="3 3"
+                vertical={false}
+              />
 
-            <XAxis dataKey="time" />
+              <XAxis
+                dataKey="time"
+                tick={{
+                  fontSize: 11,
+                  fill: "#615d59"
+                }}
+                axisLine={{
+                  stroke: "#e6e6e6"
+                }}
+                tickLine={false}
+              />
 
-            <YAxis
-              label={{
-                value: "ms",
-                angle: -90,
-                position: "insideLeft"
-              }}
-            />
+              <YAxis
+                tick={{
+                  fontSize: 11,
+                  fill: "#615d59"
+                }}
+                axisLine={false}
+                tickLine={false}
+                width={55}
+              />
 
-            <Tooltip
-              formatter={(value) => [`${value} ms`, "Response Time"]}
-            />
+              <Tooltip
+                formatter={(value) => [
+                  `${value} ms`,
+                  "Response Time"
+                ]}
+              />
 
-            <Line
-              type="monotone"
-              dataKey="responseTime"
-              stroke="#8884d8"
-              strokeWidth={2}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+              <Line
+                type="monotone"
+                dataKey="responseTime"
+                stroke="#0f766e"
+                strokeWidth={2}
+                dot={false}
+                activeDot={{
+                  r: 4,
+                  fill: "#0f766e"
+                }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </section>
   );
 }

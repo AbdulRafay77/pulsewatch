@@ -1,7 +1,9 @@
 function MonitorStats({ checks }) {
   const totalChecks = checks.length;
 
-  const successfulChecks = checks.filter((check) => check.success).length;
+  const successfulChecks = checks.filter(
+    (check) => check.success
+  ).length;
 
   const uptime =
     totalChecks === 0
@@ -19,34 +21,52 @@ function MonitorStats({ checks }) {
       : Math.round(totalResponseTime / totalChecks);
 
   return (
-    <section>
+    <section className="monitor-stats-section">
       <h2>Recent Statistics</h2>
 
-      <div>
-        <div>
-          <strong>{totalChecks}</strong>
-          <p>Total Checks</p>
+      <div className="monitor-stats-grid">
+        <div className="monitor-stat-card">
+          <p className="monitor-stat-value">
+            {totalChecks}
+          </p>
+
+          <p className="monitor-stat-label">
+            Total Checks
+          </p>
         </div>
 
-        <div>
-          <strong>{successfulChecks}</strong>
-          <p>Successful Checks</p>
+        <div className="monitor-stat-card">
+          <p className="monitor-stat-value">
+            {successfulChecks}
+          </p>
+
+          <p className="monitor-stat-label">
+            Successful Checks
+          </p>
         </div>
 
-        <div>
-          <strong>
-            {uptime === null ? "N/A" : `${uptime.toFixed(2)}%`}
-          </strong>
-          <p>Recent Uptime</p>
+        <div className="monitor-stat-card">
+          <p className="monitor-stat-value">
+            {uptime === null
+              ? "N/A"
+              : `${uptime.toFixed(2)}%`}
+          </p>
+
+          <p className="monitor-stat-label">
+            Recent Uptime
+          </p>
         </div>
 
-        <div>
-          <strong>
+        <div className="monitor-stat-card">
+          <p className="monitor-stat-value">
             {averageResponseTime === null
               ? "N/A"
               : `${averageResponseTime} ms`}
-          </strong>
-          <p>Average Response Time</p>
+          </p>
+
+          <p className="monitor-stat-label">
+            Average Response Time
+          </p>
         </div>
       </div>
     </section>

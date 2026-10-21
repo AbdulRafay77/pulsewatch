@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import useMonitorDetails from "../hooks/useMonitorDetails.js";
 import MonitorStats from "../components/MonitorStats.jsx";
 import ResponseTimeChart from "../components/ResponseTimeChart.jsx";
+import "../monitorDetails.css";
 
 function MonitorDetailsPage() {
   const { id } = useParams();
@@ -14,94 +15,157 @@ function MonitorDetailsPage() {
   } = useMonitorDetails(id);
 
   if (loading) {
-    return <p>Loading monitor details...</p>;
+    return (
+      <main className="monitor-details-page">
+        <p>Loading monitor details...</p>
+      </main>
+    );
   }
 
   if (error) {
-    return <p role="alert">{error}</p>;
+    return (
+      <main className="monitor-details-page">
+        <p className="error-message" role="alert">
+          {error}
+        </p>
+      </main>
+    );
   }
 
   if (!monitor) {
-    return <p>This monitor could not be found.</p>;
+    return (
+      <main className="monitor-details-page">
+        <p>This monitor could not be found.</p>
+      </main>
+    );
   }
 
-  const displayedStatus = monitor.isPaused
-    ? "PAUSED"
-    : monitor.status.toUpperCase();
+  const status = monitor.isPaused
+    ? "paused"
+    : monitor.status;
 
   return (
-    <main>
-      <header>
-        <h1>{monitor.name}</h1>
-        <p>Status: <strong>{displayedStatus}</strong></p>
+    <main className="monitor-details-page">
+      <section className="monitor-details-header">
+        <div className="monitor-details-header-top">
+          <div>
+            <h1>{monitor.name}</h1>
 
-        <p>
-          <a href={monitor.url} target="_blank" rel="noreferrer">
-            {monitor.url}
-          </a>
-        </p>
-      </header>
+            <a
+              className="monitor-details-url"
+              href={monitor.url}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {monitor.url}
+            </a>
+          </div>
 
-      <section>
-        <h2>Configuration</h2>
+          <span
+            className={`details-status details-status-${status}`}
+          >
+            {status.toUpperCase()}
+          </span>
+        </div>
 
-        <p>
-          Check Interval: {monitor.intervalMinutes} minutes
-        </p>
+        <div className="monitor-configuration">
+          <div className="monitor-config-item">
+            <span className="monitor-config-label">
+              Check Interval
+            </span>
 
-        <p>Timeout: {monitor.timeoutMs} ms</p>
+            <span className="monitor-config-value">
+              {monitor.intervalMinutes} minutes
+            </span>
+          </div>
 
-        <p>
-          Last Checked:{" "}
-          {monitor.lastCheckedAt
-            ? new Date(monitor.lastCheckedAt).toLocaleString()
-            : "Never"}
-        </p>
+          <div className="monitor-config-item">
+            <span className="monitor-config-label">
+              Timeout
+            </span>
+
+            <span className="monitor-config-value">
+              {monitor.timeoutMs} ms
+            </span>
+          </div>
+
+          <div className="monitor-config-item">
+            <span className="monitor-config-label">
+              Last Checked
+            </span>
+
+            <span className="monitor-config-value">
+              {monitor.lastCheckedAt
+                ? new Date(
+                    monitor.lastCheckedAt
+                  ).toLocaleString()
+                : "Never"}
+            </span>
+          </div>
+        </div>
       </section>
 
       <MonitorStats checks={checks} />
 
       <ResponseTimeChart checks={checks} />
 
-      <section>
+      <section className="check-history-section">
         <h2>Recent Checks</h2>
 
         {checks.length === 0 ? (
-          <p>No checks have been recorded yet.</p>
+          <div className="check-history-empty">
+            No checks have been recorded yet.
+          </div>
         ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Status</th>
-                <th>HTTP Status</th>
-                <th>Response Time</th>
-                <th>Checked At</th>
-                <th>Error</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {checks.map((check) => (
-                <tr key={check._id}>
-                  <td>
-                    <strong>
-                      {check.success ? "UP" : "DOWN"}
-                    </strong>
-                  </td>
-
-                  <td>{check.statusCode ?? "N/A"}</td>
-
-                  <td>{check.responseTime} ms</td>
-
-                  <td>
-                    {new Date(check.checkedAt).toLocaleString()}
-                  </td>
-
-                  <td>{check.errorMessage || "—"}</td>
+          <div className="check-table-wrapper">
+            <table className="check-table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>HTTP Status</th>
+                  <th>Response Time</th>
+                  <th>Checked At</th>
+                  <th>Error</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {checks.map((check) => (
+                  <tr key={check._id}>
+                    <td>
+                      <span
+                        className={
+                          check.success
+                            ? "check-status check-status-up"
+                            : "check-status check-status-down"
+                        }
+                      >
+                        {check.success ? "UP" : "DOWN"}
+                      </span>
+                    </td>
+
+                    <td>
+                      {check.statusCode ?? "N/A"}
+                    </td>
+
+                    <td>
+                      {check.responseTime} ms
+                    </td>
+
+                    <td>
+                      {new Date(
+                        check.checkedAt
+                      ).toLocaleString()}
+                    </td>
+
+                    <td className="check-error">
+                      {check.errorMessage || "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
     </main>
